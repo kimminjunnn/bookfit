@@ -1,4 +1,4 @@
-import { Book, BookCategory, BookLevel } from "@/types/book";
+import { Book, BookCategory, BookLevel, StudyBookType } from "@/types/book";
 
 // Normalized category mapping to match BookCategory union type
 const mapCategory = (kyoboCategory: string): BookCategory => {
@@ -34,7 +34,7 @@ export function mapKyoboToBook(item: any): Book {
   const category = mapCategory(item.saleCmdtClstName || "");
 
   // Determine studyBookType if category is Exam/Major
-  let studyBookType;
+  let studyBookType: StudyBookType | undefined;
   if (category === "자격증/수험서" || category === "전공서") {
     studyBookType = "개념서"; // Fallback default
     if (item.cmdtName?.includes("문제집")) {

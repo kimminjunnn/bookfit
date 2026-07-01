@@ -58,6 +58,14 @@ export default function AiConsultModal() {
     setLastInput(null);
   };
 
+  const handleClose = () => {
+    closeModal();
+    setStatus("idle");
+    setResult(null);
+    setErrorMessage("");
+    setLastInput(null);
+  };
+
   // Fallback handler: fetch bestseller-based recommendations directly
   const handleFallback = async () => {
     setStatus("loading");
@@ -84,7 +92,7 @@ export default function AiConsultModal() {
       {/* Backdrop/Overlay */}
       <div
         className="fixed inset-0 bg-black/60 transition-opacity duration-300 modal-overlay-enter"
-        onClick={closeModal}
+        onClick={handleClose}
       />
 
       {/* Modal Container */}
@@ -100,7 +108,7 @@ export default function AiConsultModal() {
             </span>
           </div>
           <button
-            onClick={closeModal}
+            onClick={handleClose}
             className="text-white hover:opacity-80 transition-opacity flex items-center justify-center p-1 cursor-pointer"
             aria-label="닫기"
           >
