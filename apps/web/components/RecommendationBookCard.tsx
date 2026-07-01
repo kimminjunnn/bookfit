@@ -93,7 +93,7 @@ export default function RecommendationBookCard({
           
           {author && (
             <p className="text-[13px] text-on-surface-variant/80 mt-0.5">
-              {author} 저 {price && `· ${price.toLocaleString("ko-KR")}원`}
+              {author} 저자 {price && `· ${price.toLocaleString("ko-KR")}원`}
             </p>
           )}
 

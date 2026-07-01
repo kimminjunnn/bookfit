@@ -88,11 +88,14 @@ function NewReleaseCard({ book, index = 0 }: BookCardProps) {
       <div className="relative aspect-[3/4] w-full rounded-lg bg-surface border border-outline-variant shadow-sm overflow-hidden mb-sm transition-transform group-hover:-translate-y-1">
         <BookCover book={book} index={index} />
       </div>
-      <h3 className="text-[20px] font-semibold text-on-surface line-clamp-1">
+      <h3 className="text-[15px] font-semibold text-on-surface line-clamp-1">
         {book.title}
       </h3>
       <p className="text-[14px] text-on-surface-variant mt-base">
-        {book.author} 저
+        {book.author} 저자
+      </p>
+      <p className="text-[12px] text-on-surface-variant/75 mt-xs line-clamp-2 h-[34px] leading-snug">
+        {book.description}
       </p>
       <p className="text-[15px] font-semibold text-primary mt-xs">
         {formatPrice(book.price)}
@@ -117,11 +120,14 @@ function BestsellerCard({
         </div>
         <BookCover book={book} index={index} />
       </div>
-      <h3 className="text-[20px] font-semibold text-on-surface line-clamp-1">
+      <h3 className="text-[15px] font-semibold text-on-surface line-clamp-1">
         {book.title}
       </h3>
       <p className="text-[14px] text-on-surface-variant mt-base">
-        {book.author} 저
+        {book.author} 저자
+      </p>
+      <p className="text-[12px] text-on-surface-variant/75 mt-xs line-clamp-2 h-[34px] leading-snug">
+        {book.description}
       </p>
       <div className="flex items-center gap-xs mt-xs">
         <span className="text-error font-bold text-[13px]">{discount}%</span>
@@ -146,7 +152,7 @@ function RecommendationCard({ book, index = 0 }: BookCardProps) {
       <span className="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[11px] font-bold rounded mb-xs inline-block">
         {book.category}
       </span>
-      <h3 className="text-[20px] font-semibold text-on-surface line-clamp-1">
+      <h3 className="text-[15px] font-semibold text-on-surface line-clamp-1">
         {book.title}
       </h3>
       <p className="text-[13px] text-on-surface-variant mt-xs line-clamp-2">
