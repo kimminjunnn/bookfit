@@ -1,0 +1,97 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+
+export default function Header() {
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  return (
+    <nav className="sticky top-0 h-[72px] w-full bg-white border-b border-outline-variant z-50">
+      <div className="flex justify-between items-center max-w-[1200px] mx-auto px-gutter w-full h-full">
+        {/* 로고 + 네비게이션 */}
+        <div className="flex items-center gap-xl">
+          <Link
+            href="/"
+            className="text-[24px] font-bold text-primary flex items-center gap-xs"
+          >
+            교보문고
+          </Link>
+          <div className="hidden md:flex items-center gap-lg">
+            <Link
+              href="/"
+              className="text-primary font-bold border-b-2 border-primary pb-1 text-[15px] tracking-[0.02em]"
+            >
+              홈
+            </Link>
+            <Link
+              href="#"
+              className="text-on-surface-variant text-[15px] font-semibold tracking-[0.02em] hover:text-primary transition-colors"
+            >
+              카테고리
+            </Link>
+            <Link
+              href="#"
+              className="text-on-surface-variant text-[15px] font-semibold tracking-[0.02em] hover:text-primary transition-colors"
+            >
+              베스트셀러
+            </Link>
+            <Link
+              href="#"
+              className="text-on-surface-variant text-[15px] font-semibold tracking-[0.02em] hover:text-primary transition-colors"
+            >
+              신간
+            </Link>
+          </div>
+        </div>
+
+        {/* 검색바 + 아이콘 */}
+        <div className="flex items-center gap-md">
+          <div className="relative hidden sm:block">
+            <input
+              type="text"
+              placeholder="제목, 저자, 출판사 검색"
+              className="w-[320px] h-12 px-md pl-10 rounded-lg border border-outline-variant bg-[#F5F5F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-[15px]"
+            />
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
+              search
+            </span>
+          </div>
+
+          {/* 모바일 검색 토글 */}
+          <button
+            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+            className="sm:hidden w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface transition-colors"
+          >
+            <span className="material-symbols-outlined text-on-surface-variant">
+              search
+            </span>
+          </button>
+
+          <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface transition-colors">
+            <span className="material-symbols-outlined text-on-surface-variant">
+              person
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* 모바일 검색바 */}
+      {mobileSearchOpen && (
+        <div className="sm:hidden px-gutter pb-sm bg-white border-b border-outline-variant">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="제목, 저자, 출판사 검색"
+              className="w-full h-12 px-md pl-10 rounded-lg border border-outline-variant bg-[#F5F5F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-[15px]"
+              autoFocus
+            />
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
+              search
+            </span>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+}
