@@ -1,7 +1,10 @@
+"use client";
+
 import { Book } from "@/types/book";
 import { COVER_GRADIENTS } from "@/dummy_data/dummy-books";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 type BookCardVariant = "new-release" | "bestseller" | "recommendation";
 
@@ -23,26 +26,14 @@ function getGradient(index: number): string {
   return COVER_GRADIENTS[index % COVER_GRADIENTS.length];
 }
 
-/** 커버 이미지 또는 플레이스홀더 렌더 */
-function BookCover({
+/** 그라디언트 플레이스홀더 */
+function CoverPlaceholder({
   book,
   index = 0,
 }: {
   book: Book;
   index?: number;
 }) {
-  if (book.coverImage) {
-    return (
-      <Image
-        src={book.coverImage}
-        alt={book.title}
-        fill
-        className="object-cover"
-        sizes="(max-width: 768px) 180px, 220px"
-      />
-    );
-  }
-
   return (
     <div
       className={`w-full h-full bg-gradient-to-br ${getGradient(index)} flex flex-col items-center justify-center p-4`}
@@ -56,6 +47,38 @@ function BookCover({
       <p className="text-white/60 text-[11px] mt-1">{book.author}</p>
     </div>
   );
+}
+
+/** 커버 이미지 또는 플레이스홀더 렌더 — 이미지 로딩 실패 시 자동 fallback */
+function BookCover({
+  book,
+  index = 0,
+}: {
+  book: Book;
+  index?: number;
+}) {
+  const [imgError, setImgError] = useState(false);
+
+  // coverImage가 없거나, 로딩 실패했거나, 아직 실제 파일이 없는 로컬 경로인 경우
+  const isExternalUrl = book.coverImage?.startsWith("http");
+  const hasValidImage = book.coverImage && (isExternalUrl || !imgError);
+
+  if (hasValidImage && !imgError) {
+    return (
+      <>
+        <Image
+          src={book.coverImage}
+          alt={book.title}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 180px, 220px"
+          onError={() => setImgError(true)}
+        />
+      </>
+    );
+  }
+
+  return <CoverPlaceholder book={book} index={index} />;
 }
 
 /** 신간 도서 카드 */

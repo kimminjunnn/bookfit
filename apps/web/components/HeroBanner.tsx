@@ -1,4 +1,10 @@
+"use client";
+
+import { useAiConsult } from "./AiConsultContext";
+
 export default function HeroBanner() {
+  const { openModal } = useAiConsult();
+
   return (
     <section className="mt-xl">
       <div className="relative w-full h-[320px] rounded-xl overflow-hidden flex items-center px-xl bg-gradient-to-br from-primary-container to-[#004D24]">
@@ -19,7 +25,10 @@ export default function HeroBanner() {
             독서의 시작부터 끝까지, 인공지능이 당신의 마음을 읽고 최고의 책을
             선별해 드립니다.
           </p>
-          <button className="bg-secondary-container text-on-secondary-container px-xl py-md rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:scale-[1.02] transition-transform shadow-md">
+          <button
+            onClick={openModal}
+            className="bg-secondary-container text-on-secondary-container px-xl py-md rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:scale-[1.02] transition-transform shadow-md cursor-pointer"
+          >
             AI 추천 시작하기
           </button>
         </div>

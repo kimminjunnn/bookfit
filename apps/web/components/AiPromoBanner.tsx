@@ -1,4 +1,10 @@
+"use client";
+
+import { useAiConsult } from "./AiConsultContext";
+
 export default function AiPromoBanner() {
+  const { openModal } = useAiConsult();
+
   return (
     <section className="mt-section">
       <div className="flex flex-col md:flex-row items-center justify-between p-xl rounded-xl bg-ai-promo-bg border border-outline-variant shadow-sm gap-xl">
@@ -21,7 +27,10 @@ export default function AiPromoBanner() {
             </p>
           </div>
         </div>
-        <button className="w-full md:w-auto h-12 px-xl bg-secondary-container text-on-secondary-container rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:opacity-90 transition-opacity whitespace-nowrap">
+        <button
+          onClick={openModal}
+          className="w-full md:w-auto h-12 px-xl bg-secondary-container text-on-secondary-container rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:opacity-90 transition-opacity whitespace-nowrap cursor-pointer"
+        >
           지금 상담 시작
         </button>
       </div>

@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingAiButton from "@/components/FloatingAiButton";
+import { AiConsultProvider } from "@/components/AiConsultContext";
+import AiConsultModal from "@/components/AiConsultModal";
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
@@ -33,10 +35,13 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-background text-on-surface font-sans">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <FloatingAiButton />
+        <AiConsultProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <FloatingAiButton />
+          <AiConsultModal />
+        </AiConsultProvider>
       </body>
     </html>
   );
