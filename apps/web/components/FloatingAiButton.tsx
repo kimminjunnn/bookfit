@@ -8,7 +8,7 @@ export default function FloatingAiButton() {
   return (
     <button
       onClick={openModal}
-      className="fixed bottom-10 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all flex items-center justify-center z-50 cursor-pointer"
+      className="fixed bottom-10 right-gutter w-14 h-14 bg-secondary-container text-on-secondary-container rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all flex items-center justify-center z-50 cursor-pointer"
       aria-label="AI 도서 상담"
     >
       <span

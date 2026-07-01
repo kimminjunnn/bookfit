@@ -36,7 +36,7 @@ export const newReleases: Book[] = [
     reviewSummary: "잔잔하지만 강렬한 여운을 남기는 소설. 현대인의 외로움에 공감하게 됩니다.",
     targetReader: "일상의 고독을 느끼는 20~40대 독자",
     pickupAvailable: true,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuA_Po0gmzwfS3APDCn0-KGEDc-DtfTfhN5d1LfTvicTduIDzYXAQ2iVGBrGxfQrUWv2Q0QMW2P4jT8kol5t1d-hMlDGST255VlPDv1X0QdfsOEzxatD7DhvQ-xokyJFPmJFPan_ZI0c6NOA1mz0L3W2BMszCG1V9tXHsRorwtCvm0Qc5fyJNWe36VUN7hmD95tx0ZmkcEd5lakp9uTonSq3Ap6KyWFiZx1fQ9UwovlVkYXmtAw50GLUr4F3a_qgki-PcOOLnP1GasM",
   },
   {
     id: "new-002",
@@ -50,7 +50,7 @@ export const newReleases: Book[] = [
     reviewSummary: "비전공자도 이해할 수 있는 쉬운 AI 입문서. 실생활 예시가 풍부합니다.",
     targetReader: "AI에 관심 있는 비전공자, 직장인",
     pickupAvailable: true,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuBzFyFBPaq3EiW0uXnNpaL30AisC1pZR1ZnyQ3qd7L6-NK_UcD-13VmRfTqutxa40q9_3eS5iSbqOzSqOs0uphLXUx4Y_kZK2YUl0lAWOzAbx0GMhBA8m_Ab6B9PRjfAC8Pn4VOuaL3VEqQ2r0_Mno3aQv0l3ce9KgFiBRnyjcfMkBu_9TKRPkIh1W8tgkCUTF30NL9Sx30Nl2JsGbWSTstFY-WxYK-EMatdtFpKK9ryHuCQHwesWgoMcslvHEZCnhg5wnLX609LJg",
   },
   {
     id: "new-003",
@@ -64,7 +64,7 @@ export const newReleases: Book[] = [
     reviewSummary: "계절마다 한 번씩 꺼내 읽고 싶은 따뜻한 에세이. 자연 묘사가 아름답습니다.",
     targetReader: "자연과 일상에서 위로를 찾는 독자",
     pickupAvailable: false,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuAiGNCeb4bETXoSL16DKhcZZbz2t25cEXTI6PnLHeffpsmoQDaZgGDHwl2lS51FyIFgS1GFOqZqmoRVBPVeRNN9C7wQQjf-An_MuQsg24sG1HiRE1s2fEzeMdMUw5qJBwJcQsuz6MEEiEKqNoGo3oQ6JiZYxIu36Q0dMAIkH6j3vy8KQArUzhCCm5MhcpYO3GbGUabBzfJy9BlTGr4PavcMwMAK7jU_3fUkOsa67ke8rESck35Wxl6qFLkj6VdgY91Xmw3_1t-PoW8",
   },
   {
     id: "new-004",
@@ -78,7 +78,7 @@ export const newReleases: Book[] = [
     reviewSummary: "막연한 불안 대신 구체적인 액션 플랜을 얻을 수 있어 좋았습니다.",
     targetReader: "커리어 전환을 고민하는 30~40대 직장인",
     pickupAvailable: true,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuBiVbO4L7mZR4uGnborrpR6VR0Xq2Hxiwkgz5hvHcl1qq-uf7gmdQhoe_uN0O0rk5F2pnRcyrANfNWKDaIVWJQ0i_P09-Vu-hX9xR2M8xYUi5SAPT1RWFfrXGvuP2cI7LEempM7LTUiSJgbSKiP1gxPi-rgTdPE3n074gVrf2C-RefAa-ar8BwkPzN8dhYZYONwWpG1TVh-Trljn_suCmeF7VTs7oWc47S_XLMtg-NU30EgFO6SOOrEcltncRTULLztGE2meVSpLQU",
   },
   {
     id: "new-005",
@@ -92,8 +92,8 @@ export const newReleases: Book[] = [
     reviewSummary: "기록 습관을 시작하고 싶은 사람에게 동기부여가 되는 책.",
     targetReader: "글쓰기와 기록에 관심 있는 모든 독자",
     pickupAvailable: true,
-    coverImage: "",
-  },
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuBKVPbO7lBfmpQ2Kz30gZr2bKshiz3s08P-Hu2QtY9dtT2xihvkGXBqPq-nBZhYsmrVjwGxp3AvEZtp4XaIU4bM5ax_rmoU4hJROUOQSKYoW45scxVMIzR85sVt2w-GJbCe2oEGI9fQK9_KypueA9FsNeKES-Nl_q-setUHOAfcaF0QORUCgMEpE8OWMi1NN3DmiZo8nWgSBFPTYVvlu0FdVkUMd2Y-pbGacD4dMjFj7wTqYyDDeWSFxxiwXbf_JC2HEaJsC9Ccxbk",
+  }
 ];
 
 export const bestsellers: Book[] = [
@@ -109,7 +109,7 @@ export const bestsellers: Book[] = [
     reviewSummary: "매년 기대하는 시리즈. 마케터, 기획자에게 필수 도서.",
     targetReader: "마케터, 기획자, 경영인, 트렌드에 관심 있는 일반 독자",
     pickupAvailable: true,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuB2Uq_qirO7ILf8kWUshtc3-qKgrd2cfSwmbkxp7cV9GO2j_bTlZLMuv6zMy3F3QXTn1B-GWOGBCFmVeKgRWuAvpMcJ2lMYglkrJXNlPkXtI8ZF25r9m-y5kiIjqoieyQqLpNO-L-b91746bNr70Fz-28SH-5gmSRVn31JWIhV2zDLHriQCDNQOswTzMKIgevWh-LxdL8Gtri-5at-41nLMj6V5u_oSrepB2eO7x516Wv9IIP4Twboc8REhebM6QZ3-4lBmoJc1oKQ",
   },
   {
     id: "best-002",
@@ -123,7 +123,7 @@ export const bestsellers: Book[] = [
     reviewSummary: "어렵기만 했던 철학을 삶에 녹여낸 좋은 해설서.",
     targetReader: "인생의 전환점에 서 있는 30~50대 독자",
     pickupAvailable: true,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuC-BCtpmF1zOv5FXDihLmppI5v3Z2efPqc8I7rRKPxkeN-AZEisMkqgUTAZZhRUV4XUgSdLd24S_n-PpehvmfFBlv9VK93H9gfPAfvBvUCD3YHi1VNbYou3CC3gRwC9zA0P6moQrpEu3gFjZq3WEEngvaT-sM0tvQjxVNUnDo9xfOG4JY0VYwoBBK7DGNhGzhVsdUI-5RUZodinadggyHGn3nU1ANA5ABvouRfe-qCJGiP4zTypAhYaSSBgSh_sWLe6zDynNfMamsE",
   },
   {
     id: "best-003",
@@ -137,7 +137,7 @@ export const bestsellers: Book[] = [
     reviewSummary: "실무에서 바로 쓸 수 있는 프롬프트와 팁이 가득. AI 입문자에게 추천.",
     targetReader: "AI를 실무에 활용하고 싶은 직장인, 크리에이터",
     pickupAvailable: false,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuA6mTwqZAUAOr8IASbSDc3wb6Jv9KzNa1Hqixcdq603eFn6DZ50_ffSANfkxc1uSWepZX1V3dp79MNuDSovtVbP7lZD6zc75z3pSouk3Gpj2Fr-pMw3vGRrIjs96eXIvJcpWj_A-ar01xtzinqLeVaykkf801fd6dDE8iZvmKqlZWL7tpW_V_NVHeyVJj1ap4pN_m50J1OzXwg7UUg1fR0noy69ze1xb_4yrv5DUaIIWTCW1Txpi23UYe6w9II1AwGKHN_USusUGhs",
   },
   {
     id: "best-004",
@@ -151,8 +151,8 @@ export const bestsellers: Book[] = [
     reviewSummary: "여행 에세이와 인문학의 만남. 도시를 보는 눈이 달라집니다.",
     targetReader: "여행과 도시 문화에 관심 있는 교양 독자",
     pickupAvailable: true,
-    coverImage: "",
-  },
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuDwRVTHt9LIBf9EaMy-FDv9df2hvlVsIai1fvZc2BPlHMvxvQ43rOslZtTiL9jT_eDDL6j7vTc_rJH2NMusBojxk7CDxvlpNeFia1DQTVzaprvthq1H278ZHZY8OnfZ80JCN4HGIXeWbxN18owU5KCDzJGSko58Bb77859lwaFj4MUzgv4_4EUaVEBG81qY7WKkgJBh9x4Aeeq56dWD6lTkHEGeoHPE-emyG7m-pyF0E4ghV27ECOmeFDphWx2s_XPtCdXhkcb9bNI",
+  }
 ];
 
 export const recommendations: Book[] = [
@@ -168,7 +168,7 @@ export const recommendations: Book[] = [
     reviewSummary: "작은 습관의 힘을 체감할 수 있는 실용서. 구체적인 실천법이 도움됩니다.",
     targetReader: "새로운 습관을 만들고 싶은 모든 독자",
     pickupAvailable: true,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuDsIAUMwD-qpC9YfKuQ-8amJiJ5sPp4M_7n0SAlNuVlqf0tQvBrdbgAKPDRv5MIm6btKFgdo9AwSjEHJ-s-Gvf1KnHQ2KBpv6N0gppPnU6BnfSZ_Sc9De6oNuDC51fEgdWdOq2LWLIg13v-Sm2SYU54-KiPl-ZVe9aY5P_PwgGhIYEXlmDCXebEdFWPcEIwCGKTK-XmN2XM703NwPeRZgqOwyj5svI3gvZixov8G6Nbdsg86vXAcUMkwfgiz3XOO6EklJKGdbcQxCU",
   },
   {
     id: "rec-002",
@@ -182,7 +182,7 @@ export const recommendations: Book[] = [
     reviewSummary: "독서의 의미를 다시 생각하게 하는 깊이 있는 인문서.",
     targetReader: "독서와 지식 문화에 관심 있는 인문학 애호가",
     pickupAvailable: false,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuAbr7Z-yD7MZqpp1-W5jb4mrI4F3wjSCHFyxVMB5vcc5XG2SUf0MAuVh8MRywLqttfVM8uYbLPtWaJDsDtKcvlsRuF-IKYJeQnKLvj5mJ3q8Z5QKFTNR8-1gEym7QWudH_-HmYnQMDqAn1sdvH4xzUE7FU56n-hq7dBwsltDc86xDeluw9cmTv-vOnA48K--84K7uQIhUMXt4gP17-A-_P10a5V4wEpfjx5nyHslUsVA6bSY39C-5PWRLHu8GwhkbBLu8v890FijaI",
   },
   {
     id: "rec-003",
@@ -194,9 +194,9 @@ export const recommendations: Book[] = [
     description: "데이터가 어떻게 가치를 창출하고 시장을 변화시키는가. 데이터 경제의 핵심을 비즈니스 관점에서 분석합니다.",
     toc: ["데이터 경제란", "가치 창출 모델", "플랫폼과 데이터", "개인정보와 규제", "미래 비즈니스"],
     reviewSummary: "데이터 비즈니스의 전체 그림을 잘 잡아주는 경영서.",
-    targetReader: "데이터 산업과 비즈니스 전략에 관심 있는 기획자, 경영인",
+    targetReader: "데이터 산업 and 비즈니스 전략에 관심 있는 기획자, 경영인",
     pickupAvailable: true,
-    coverImage: "",
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuDGXOYjHh9vDLO3ElXkCx6V67Ka8PDthKEwN3Dl8tUjiaiVIFmJoZ1YpJks30zQkfJ6MfWpZ5J7xpO_bOY793AsiyBSnRCUX7SBswpBvVf5iTVk0VoBdRKanGlKocQczopNY_kJj7gM2DDytaQ5O4OEPx_cNgtglfjCS3TpAtnCo2dAC4cE3eG1zUn4Llwfx16vpUNK11Gx-AFvlBfKZkv4_4klFt7YNLQvojQXstFoIgZlEpqp81j2mntk1aD9ez8OQzhSrHot1lQ",
   },
   {
     id: "rec-004",
@@ -210,8 +210,8 @@ export const recommendations: Book[] = [
     reviewSummary: "몽환적인 분위기와 아름다운 문장이 인상적인 소설.",
     targetReader: "판타지와 치유 서사를 좋아하는 소설 독자",
     pickupAvailable: true,
-    coverImage: "",
-  },
+    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuDf6phJODFxv_hJOPUVe1AklMzAxeSL2VN-j9gsviWTSc5uai-ATrGnlIJRcBM76-xIL3GUXbjoZxFkWJt4fUs1O1lB07A2NzSlEBrvBR1uli5wEP59PC1_UgOWu1iKtgUFLL0-DT5vXpjWS6bQeTIecln1_p2O5yuG1d-w-9v5GAawkkHyX0NQLbetvquQFt3WKOfgaiAXzIOCMxNOMr6WsyuKcZzcaJlxh4o-lzrpj77udXtMH3H8GeFNp7OBwzhCN73-4O_loZg",
+  }
 ];
 
 /** 전체 도서 목록 (나중에 JSON 데이터로 교체) */

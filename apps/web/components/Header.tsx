@@ -10,12 +10,27 @@ export default function Header() {
     <nav className="sticky top-0 h-[72px] w-full bg-white border-b border-outline-variant z-50">
       <div className="flex justify-between items-center max-w-[1200px] mx-auto px-gutter w-full h-full">
         {/* 로고 + 네비게이션 */}
-        <div className="flex items-center gap-xl">
+        <div className="flex items-center gap-[48px]">
           <Link
             href="/"
             className="text-[24px] font-bold text-primary flex items-center gap-xs"
           >
-            교보문고
+            <div className="flex items-center gap-xs">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <svg
+                  className="w-full h-full"
+                  fill="none"
+                  viewBox="0 0 40 40"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M20 5C15 5 10 8 10 13C10 15 11 17 13 18.5C12 20 10 21 8 21C11 21 14 20 16 18.5C17.3 18.8 18.6 19 20 19C27 19 32 15 32 10C32 7.2 30 5 27 5H20Z"
+                    fill="#006B32"
+                  ></path>
+                </svg>
+              </div>
+              <span>교보문고</span>
+            </div>
           </Link>
           <div className="hidden md:flex items-center gap-lg">
             <Link
