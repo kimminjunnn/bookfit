@@ -51,6 +51,10 @@ export type RecommendedBook = {
   reason: string;
   order: number;
   pickupAvailable: boolean;
+  coverImage?: string;
+  author?: string;
+  price?: number;
+  category?: BookCategory;
 };
 
 export type AiRecommendationResult = {

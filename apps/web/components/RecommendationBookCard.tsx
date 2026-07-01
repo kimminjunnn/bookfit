@@ -28,10 +28,10 @@ export default function RecommendationBookCard({
   }, [recommendedBook.id]);
 
   const bookTitle = fullBook?.title || recommendedBook.title;
-  const author = fullBook?.author || "";
-  const price = fullBook?.price;
-  const category = fullBook?.category;
-  const coverImage = fullBook?.coverImage;
+  const author = fullBook?.author || recommendedBook.author || "";
+  const price = fullBook?.price || recommendedBook.price;
+  const category = fullBook?.category || recommendedBook.category;
+  const coverImage = fullBook?.coverImage || recommendedBook.coverImage;
   const pickupAvailable = fullBook ? fullBook.pickupAvailable : recommendedBook.pickupAvailable;
 
   const gradientClass = COVER_GRADIENTS[index % COVER_GRADIENTS.length];

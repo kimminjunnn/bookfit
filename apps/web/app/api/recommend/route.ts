@@ -1,16 +1,25 @@
 import { NextResponse } from "next/server";
 import { Book, UserBookConsultInput, AiRecommendationResult } from "@/types/book";
 import booksData from "@/data/books.json";
+import { fetchKyoboBestsellers } from "@/lib/kyoboApi";
 
 export async function POST(request: Request) {
   try {
     const body: UserBookConsultInput = await request.json();
     const { situation, preferredCategory, goal, pickupStore } = body;
 
-    // Simulate 2-second AI processing delay
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const books = booksData as Book[];
+    let books: Book[];
+    try {
+      // 3초 타임아웃 내에 교보문고 일간 베스트 API 데이터를 가져옵니다.
+      const fetchPromise = fetchKyoboBestsellers();
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), 3000)
+      );
+      books = await Promise.race([fetchPromise, timeoutPromise]);
+    } catch (error) {
+      console.warn("Kyobo API fetch failed, falling back to local books.json:", error);
+      books = booksData as Book[];
+    }
 
     // 1. Filtering logic based on input
     let filtered = [...books];
@@ -84,6 +93,10 @@ export async function POST(request: Request) {
         reason,
         order: idx + 1,
         pickupAvailable,
+        coverImage: book.coverImage,
+        author: book.author,
+        price: book.price,
+        category: book.category,
       };
     });
 
