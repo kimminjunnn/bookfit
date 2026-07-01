@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+
+# Python 가상환경 (절대 커밋 금지)
+.venv/
+venv/
+ENV/
+env/
+
+# Chroma DB (런타임 생성 — 커밋 불필요)
+apps/api/chroma_db/
+
+# 환경변수 (보안 — 절대 커밋 금지)
+.env
+apps/api/.env
+apps/web/.env.local
+
+# Next.js 빌드 산출물
+apps/web/.next/
+apps/web/out/
+
+# Node 의존성
+node_modules/
+apps/web/node_modules/
+
+# 로그
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
