@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState } from "react";
 interface AiConsultContextType {
   isModalOpen: boolean;
   prefillText: string;
-  openModal: (prefill?: string) => void;
+  openModal: (prefill?: any) => void;
   closeModal: () => void;
 }
 
@@ -15,8 +15,8 @@ export function AiConsultProvider({ children }: { children: React.ReactNode }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [prefillText, setPrefillText] = useState("");
 
-  const openModal = (prefill?: string) => {
-    setPrefillText(prefill ?? "");
+  const openModal = (prefill?: any) => {
+    setPrefillText(typeof prefill === "string" ? prefill : "");
     setIsModalOpen(true);
   };
   const closeModal = () => setIsModalOpen(false);

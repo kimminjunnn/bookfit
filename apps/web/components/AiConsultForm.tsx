@@ -1,14 +1,19 @@
 "use client";
 
 import { UserBookConsultInput } from "@/types/book";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AiConsultFormProps {
   onSubmit: (input: UserBookConsultInput) => void;
+  initialSituation?: string;
 }
 
-export default function AiConsultForm({ onSubmit }: AiConsultFormProps) {
-  const [situation, setSituation] = useState("");
+export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiConsultFormProps) {
+  const [situation, setSituation] = useState(initialSituation);
+
+  useEffect(() => {
+    setSituation(initialSituation);
+  }, [initialSituation]);
   const [preferredCategory, setPreferredCategory] = useState("");
   const [goal, setGoal] = useState("");
   

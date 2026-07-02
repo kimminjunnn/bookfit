@@ -9,7 +9,7 @@ import ErrorState from "./ErrorState";
 import { UserBookConsultInput, AiRecommendationResult } from "@/types/book";
 
 export default function AiConsultModal() {
-  const { isModalOpen, closeModal } = useAiConsult();
+  const { isModalOpen, prefillText, closeModal } = useAiConsult();
   const [status, setStatus] = useState<"idle" | "loading" | "result" | "error">("idle");
   const [result, setResult] = useState<AiRecommendationResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -129,7 +129,7 @@ export default function AiConsultModal() {
         {/* Modal Content Area */}
         <div className="flex-1 overflow-y-auto no-scrollbar p-md space-y-md">
           {status === "idle" && (
-            <AiConsultForm onSubmit={handleFormSubmit} />
+            <AiConsultForm onSubmit={handleFormSubmit} initialSituation={prefillText} />
           )}
 
           {status === "loading" && (
