@@ -25,8 +25,6 @@ export default function AiConsultModal() {
     }
   }, [isModalOpen]);
 
-  if (!isModalOpen) return null;
-
   const handleFormSubmit = async (input: UserBookConsultInput) => {
     setLastInput(input);
     setStatus("loading");
@@ -106,6 +104,8 @@ export default function AiConsultModal() {
       setStatus("error");
     }
   };
+
+  if (!isModalOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
