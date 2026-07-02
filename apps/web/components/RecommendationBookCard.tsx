@@ -109,7 +109,7 @@ export default function RecommendationBookCard({
         {/* View Details Button */}
         <div className="mt-3 flex justify-end">
           <Link
-            href={`/books/${recommendedBook.id}`}
+            href={`/books/${recommendedBook.id}?reason=${encodeURIComponent(recommendedBook.reason)}`}
             className="text-[12px] font-semibold text-secondary hover:text-secondary-container flex items-center gap-0.5 group"
           >
             상세 보기
