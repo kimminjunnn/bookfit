@@ -2,7 +2,6 @@ import HeroBanner from "@/components/HeroBanner";
 import AiPromoBanner from "@/components/AiPromoBanner";
 import NewReleases from "@/components/NewReleases";
 import Bestsellers from "@/components/Bestsellers";
-import Recommendations from "@/components/Recommendations";
 
 export default function Home() {
   return (
@@ -11,7 +10,6 @@ export default function Home() {
       <AiPromoBanner />
       <NewReleases />
       <Bestsellers />
-      <Recommendations />
     </div>
   );
 }
