@@ -196,8 +196,9 @@ function BookDetailContent({ id }: { id: string }) {
             score += 40;
           }
 
-          // 3) 대분류 카테고리 일치 (가중치를 30으로 낮춰 타 분야 매칭의 진입 장벽 완화)
-          if (b.category === book.category) {
+          // 3) 대분류 카테고리 일치
+          // '기타'는 분류되지 않은 도서들의 집합이라 연관성 없는 책끼리 묶이므로 점수 제외
+          if (b.category === book.category && book.category !== "기타") {
             score += 30;
           }
 
