@@ -40,7 +40,7 @@ export default function SearchAutocomplete({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  if (query.trim().length < 2) return null;
+  if (query.trim().length < 1) return null;
 
   return (
     <div
