@@ -29,6 +29,48 @@ const STORES = [
   { id: "mokdong", name: "목동점", desc: "현대백화점 지하 2층 바로드림 데스크" },
 ];
 
+// 개별 관련 도서 카드 컴포넌트 (이미지 에러 발생 시 그라디언트 플레이스홀더로 독립 대체)
+function RelatedBookCard({ relBook, index }: { relBook: Book; index: number }) {
+  const [imgError, setImgError] = useState(false);
+  const relGradient = COVER_GRADIENTS[parseInt(relBook.id.replace(/[^0-9]/g, "")) % COVER_GRADIENTS.length] || COVER_GRADIENTS[0];
+
+  const isExternalUrl = relBook.coverImage?.startsWith("http");
+  const hasValidImage = relBook.coverImage && (isExternalUrl || !imgError);
+
+  return (
+    <Link
+      href={`/books/${relBook.id}`}
+      className="min-w-[180px] max-w-[180px] flex-shrink-0 group cursor-pointer block"
+    >
+      <div className="aspect-[3/4] rounded-xl overflow-hidden border border-outline-variant bg-white shadow-soft mb-3 relative">
+        {hasValidImage && !imgError ? (
+          <Image
+            src={relBook.coverImage}
+            alt={relBook.title}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="180px"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className={`w-full h-full bg-gradient-to-br ${relGradient} flex flex-col items-center justify-center p-4 transition-transform duration-300 group-hover:scale-105`}>
+            <span className="material-symbols-outlined text-white/30 text-[36px] mb-2">
+              menu_book
+            </span>
+            <p className="text-white text-center text-[12px] font-semibold leading-tight line-clamp-2">
+              {relBook.title}
+            </p>
+          </div>
+        )}
+      </div>
+      <h3 className="text-[15px] text-on-surface font-semibold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+        {relBook.title}
+      </h3>
+      <p className="text-[14px] text-on-surface-variant mt-1">{relBook.author}</p>
+    </Link>
+  );
+}
+
 function BookDetailContent({ id }: { id: string }) {
   const searchParams = useSearchParams();
   const reason = searchParams.get("reason");
@@ -40,10 +82,25 @@ function BookDetailContent({ id }: { id: string }) {
   const [activeTab, setActiveTab] = useState<"intro" | "toc" | "review" | "pickup">("intro");
   const [relatedBooks, setRelatedBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [livePool, setLivePool] = useState<Book[]>([]);
 
   useEffect(() => {
     async function loadBookData() {
       setIsLoading(true);
+      setImgError(false); // 네비게이션 시 이미지 에러 상태 초기화
+
+      let fetchedLive: Book[] = [];
+      try {
+        const [bestRes, newRes] = await Promise.all([
+          fetch("/api/bestsellers").then((r) => (r.ok ? r.json() : [])),
+          fetch("/api/new-releases").then((r) => (r.ok ? r.json() : [])),
+        ]);
+        fetchedLive = [...bestRes, ...newRes];
+        setLivePool(fetchedLive);
+      } catch (err) {
+        console.error("Failed to load live books pool:", err);
+      }
+
       // 1. 로컬 books.json에서 검색
       let found = (booksData as Book[]).find((b) => b.id === id);
 
@@ -53,20 +110,9 @@ function BookDetailContent({ id }: { id: string }) {
         found = allDummies.find((b) => b.id === id);
       }
 
-      // 3. 만약 없으면 실시간 베스트셀러 API 결과에서 검색
+      // 3. 실시간 API 결과에서 검색
       if (!found) {
-        try {
-          const res = await fetch("/api/bestsellers");
-          if (res.ok) {
-            const liveBooks: Book[] = await res.json();
-            const foundLive = liveBooks.find((b) => b.id === id);
-            if (foundLive) {
-              found = foundLive;
-            }
-          }
-        } catch (err) {
-          console.error("Failed to load live bestsellers in detail page:", err);
-        }
+        found = fetchedLive.find((b) => b.id === id);
       }
 
       if (found) {
@@ -86,6 +132,7 @@ function BookDetailContent({ id }: { id: string }) {
         ...newReleases,
         ...dummyBestsellers,
         ...dummyRecommendations,
+        ...livePool,
       ];
       const filtered = allBooksData.filter((b) => b.category === book.category && b.id !== book.id);
       // 중복 제거
@@ -94,7 +141,7 @@ function BookDetailContent({ id }: { id: string }) {
       );
       setRelatedBooks(unique.slice(0, 6));
     }
-  }, [book]);
+  }, [book, livePool]);
 
   if (isLoading) {
     return (
@@ -435,41 +482,9 @@ function BookDetailContent({ id }: { id: string }) {
             </h2>
           </div>
           <div className="flex overflow-x-auto gap-6 pb-4 no-scrollbar">
-            {relatedBooks.map((relBook, i) => {
-              const relGradient = COVER_GRADIENTS[parseInt(relBook.id.replace(/[^0-9]/g, "")) % COVER_GRADIENTS.length] || COVER_GRADIENTS[0];
-              return (
-                <Link
-                  key={relBook.id}
-                  href={`/books/${relBook.id}`}
-                  className="min-w-[180px] max-w-[180px] flex-shrink-0 group cursor-pointer block"
-                >
-                  <div className="aspect-[3/4] rounded-xl overflow-hidden border border-outline-variant bg-white shadow-soft mb-3 relative">
-                    {relBook.coverImage ? (
-                      <Image
-                        src={relBook.coverImage}
-                        alt={relBook.title}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        sizes="180px"
-                      />
-                    ) : (
-                      <div className={`w-full h-full bg-gradient-to-br ${relGradient} flex flex-col items-center justify-center p-4 transition-transform duration-300 group-hover:scale-105`}>
-                        <span className="material-symbols-outlined text-white/30 text-[36px] mb-2">
-                          menu_book
-                        </span>
-                        <p className="text-white text-center text-[12px] font-semibold leading-tight line-clamp-2">
-                          {relBook.title}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="text-[15px] text-on-surface font-semibold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                    {relBook.title}
-                  </h3>
-                  <p className="text-[14px] text-on-surface-variant mt-1">{relBook.author}</p>
-                </Link>
-              );
-            })}
+            {relatedBooks.map((relBook, i) => (
+              <RelatedBookCard key={relBook.id} relBook={relBook} index={i} />
+            ))}
           </div>
         </section>
       )}
