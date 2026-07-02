@@ -24,22 +24,11 @@ export default function Header() {
             href="/"
             className="text-[24px] font-bold text-primary flex items-center gap-xs"
           >
-            <div className="flex items-center gap-xs">
-              <div className="w-8 h-8 flex items-center justify-center">
-                <svg
-                  className="w-full h-full"
-                  fill="none"
-                  viewBox="0 0 40 40"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M20 5C15 5 10 8 10 13C10 15 11 17 13 18.5C12 20 10 21 8 21C11 21 14 20 16 18.5C17.3 18.8 18.6 19 20 19C27 19 32 15 32 10C32 7.2 30 5 27 5H20Z"
-                    fill="#006B32"
-                  ></path>
-                </svg>
-              </div>
-              <span>교보문고</span>
-            </div>
+            <img
+              src="/kyobo-logo.png"
+              alt="교보문고"
+              className="h-[28px] w-auto object-contain"
+            />
           </Link>
           <div className="hidden md:flex items-center gap-lg">
             <Link href="/bestsellers" className={getLinkClass("/bestsellers")}>
