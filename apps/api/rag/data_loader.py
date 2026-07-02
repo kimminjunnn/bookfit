@@ -235,7 +235,10 @@ def background_fetch_and_update():
                         "id": book_id,
                         "title": book.get("title"),
                         "category": book.get("category"),
-                        "pickupAvailable": book.get("pickupAvailable")
+                        "pickupAvailable": book.get("pickupAvailable"),
+                        "coverImage": book.get("coverImage"),
+                        "author": book.get("author"),
+                        "price": book.get("price")
                     }
                 )
                 documents.append(doc)
@@ -320,7 +323,10 @@ def get_vector_store() -> Chroma:
                 "id": book.get("id"),
                 "title": book.get("title"),
                 "category": book.get("category"),
-                "pickupAvailable": book.get("pickupAvailable")
+                "pickupAvailable": book.get("pickupAvailable"),
+                "coverImage": book.get("coverImage"),
+                "author": book.get("author"),
+                "price": book.get("price")
             }
         )
         documents.append(doc)

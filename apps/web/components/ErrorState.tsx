@@ -23,12 +23,12 @@ export default function ErrorState({
         <h3 className="font-semibold text-[18px] text-error">
           알 수 없는 오류가 발생했습니다
         </h3>
-        <p className="text-[14px] text-on-surface-variant max-w-sm">
+        <p className="text-[14px] text-on-surface-variant max-w-[384px]">
           {message}
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-xs w-full max-w-xs">
+      <div className="flex flex-col sm:flex-row gap-xs w-full max-w-[320px]">
         <button
           onClick={onRetry}
           className="flex-1 h-11 bg-primary text-white rounded-lg font-semibold text-[14px] flex items-center justify-center gap-xs hover:opacity-90 active:scale-[0.98] transition-all"

@@ -14,6 +14,10 @@ class RecommendedBookSchema(BaseModel):
     reason: str = Field(description="사용자의 상황을 분석하여 이 책을 추천하는 2~3문장의 구체적인 이유")
     order: int = Field(description="읽는 순서 (수험서는 1, 2, 3 순서 지정, 일반 도서는 순서가 중요하지 않으면 1로 고정)")
     pickupAvailable: bool = Field(description="제공된 데이터의 pickupAvailable 필드 값 그대로 사용 (가능 여부)")
+    coverImage: Optional[str] = Field(None, description="제공된 데이터의 coverImage 필드 값 그대로 사용")
+    author: Optional[str] = Field(None, description="제공된 데이터의 author 필드 값 그대로 사용")
+    price: Optional[int] = Field(None, description="제공된 데이터의 price 필드 값 그대로 사용")
+    category: Optional[str] = Field(None, description="제공된 데이터의 category 필드 값 그대로 사용")
 
 class AiRecommendationResultSchema(BaseModel):
     summary: str = Field(description="사용자의 현재 고민/상황을 깊이 공감하고 추천 방향성을 설명하는 요약문 (3~4문장)")
@@ -86,11 +90,18 @@ def get_ai_recommendation(
         pickup = d.metadata.get("pickupAvailable")
         category = d.metadata.get("category")
         
+        cover_image = d.metadata.get("coverImage")
+        author = d.metadata.get("author")
+        price = d.metadata.get("price")
+        
         rag_books_map[book_id] = {
             "id": book_id,
             "title": title,
             "pickupAvailable": pickup,
             "category": category,
+            "coverImage": cover_image,
+            "author": author,
+            "price": price,
             "content": d.page_content
         }
         
@@ -169,10 +180,14 @@ def get_ai_recommendation(
         
         # LLM이 추천한 ID가 실제 RAG 검색 결과에 존재하는지 대조
         if r_id in rag_books_map:
-            # 존재한다면, 데이터 정합성 유지 (DB의 pickupAvailable, title 값 강제 덮어쓰기)
+            # 존재한다면, 데이터 정합성 유지 (DB의 값들 강제 덮어쓰기)
             actual_info = rag_books_map[r_id]
             r_book["title"] = actual_info["title"]
             r_book["pickupAvailable"] = actual_info["pickupAvailable"]
+            r_book["coverImage"] = actual_info.get("coverImage")
+            r_book["author"] = actual_info.get("author")
+            r_book["price"] = actual_info.get("price")
+            r_book["category"] = actual_info.get("category")
             validated_books.append(r_book)
         else:
             # 할루시네이션 발생: 존재하지 않는 도서 ID를 뱉었을 경우
@@ -195,7 +210,11 @@ def get_ai_recommendation(
                     "title": backup_info["title"],
                     "reason": new_reason,
                     "order": idx + 1,
-                    "pickupAvailable": backup_info["pickupAvailable"]
+                    "pickupAvailable": backup_info["pickupAvailable"],
+                    "coverImage": backup_info.get("coverImage"),
+                    "author": backup_info.get("author"),
+                    "price": backup_info.get("price"),
+                    "category": backup_info.get("category")
                 })
                 print(f"[RAG-Validation] '{r_id}'를 실제 도서 '{backup_id}'로 성공적으로 대체하였습니다.")
 
@@ -213,7 +232,11 @@ def get_ai_recommendation(
                     "title": info["title"],
                     "reason": f"고민하신 상황에 도움이 될 만한 {info['category']} 분야의 우수 도서입니다.",
                     "order": len(validated_books) + 1,
-                    "pickupAvailable": info["pickupAvailable"]
+                    "pickupAvailable": info["pickupAvailable"],
+                    "coverImage": info.get("coverImage"),
+                    "author": info.get("author"),
+                    "price": info.get("price"),
+                    "category": info.get("category")
                 })
 
     # 최종 검증된 도서 리스트를 3개로 자르거나 대입

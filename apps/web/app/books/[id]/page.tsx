@@ -446,7 +446,7 @@ function BookDetailContent({ id }: { id: string }) {
 
           {/* 4. 바로드림 가능 매장 */}
           {activeTab === "pickup" && (
-            <div className="max-w-xl">
+            <div className="max-w-[576px]">
               <div className="flex items-center gap-xs mb-md">
                 <span className="material-symbols-outlined text-primary text-[24px]">storefront</span>
                 <h3 className="text-[18px] font-bold text-on-surface">바로드림 서비스 신청</h3>
@@ -537,7 +537,7 @@ function BookDetailContent({ id }: { id: string }) {
       {/* 바로드림 성공 안내 모달 */}
       {isSuccessModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-md bg-black/60 modal-overlay-enter">
-          <div className="bg-white w-full max-w-md rounded-xl shadow-xl overflow-hidden modal-panel-enter">
+          <div className="bg-white w-full max-w-[448px] rounded-xl shadow-xl overflow-hidden modal-panel-enter">
             {/* 헤더 */}
             <div className="bg-primary text-on-primary p-lg text-center relative">
               <span className="material-symbols-outlined text-[48px] mb-xs animate-bounce" style={{ fontVariationSettings: "'FILL' 1" }}>
