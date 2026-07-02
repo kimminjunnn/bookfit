@@ -149,7 +149,7 @@ export async function fetchKyoboBestsellers(): Promise<Book[]> {
 
 export async function fetchKyoboNewReleases(): Promise<Book[]> {
   const url =
-    "https://store.kyobobook.co.kr/api/gw/pdt/v2/newest/md-pick/list?page=1&per=10&sort=rec&saleCmdtDvsnCode=KOR&soldOutExcludeYn=N&weekth=2026071";
+    "https://store.kyobobook.co.kr/api/gw/pdt/v2/newest/md-pick/list?page=1&per=100&sort=rec&saleCmdtDvsnCode=KOR&soldOutExcludeYn=N&weekth=2026071";
 
   const response = await fetch(url, {
     headers: {

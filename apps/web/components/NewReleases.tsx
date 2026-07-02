@@ -57,7 +57,7 @@ export default function NewReleases() {
           신간 도서
         </h2>
         <Link
-          href="#"
+          href="/new-releases"
           className="text-primary text-[15px] font-semibold tracking-[0.02em] flex items-center gap-xs"
         >
           더보기{" "}
