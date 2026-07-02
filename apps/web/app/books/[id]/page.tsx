@@ -40,7 +40,7 @@ function RelatedBookCard({ relBook, index }: { relBook: Book; index: number }) {
   return (
     <Link
       href={`/books/${relBook.id}`}
-      className="min-w-[180px] max-w-[180px] flex-shrink-0 group cursor-pointer block"
+      className="group cursor-pointer block min-w-0"
     >
       <div className="aspect-[3/4] rounded-xl overflow-hidden border border-outline-variant bg-white shadow-soft mb-3 relative">
         {hasValidImage && !imgError ? (
@@ -124,7 +124,15 @@ function BookDetailContent({ id }: { id: string }) {
     loadBookData();
   }, [id]);
 
-  // 관련 도서 로드 (같은 카테고리 도서 필터링, 자기 자신 제외 + ID 시드 기반 결정론적 셔플 + 실존/가상 풀 완전 격리)
+  // 한국어 조사, 어미 등 추천 연관성 분석 시 제외할 불용어(Stop Words) 사전
+  const KOREAN_STOP_WORDS = new Set([
+    "있다", "있는", "있으며", "있게", "없다", "없는", "하는", "한", "할", "하고", "하여", 
+    "위한", "위해", "대한", "대해", "통해", "통한", "으로", "에서", "그리고", "하지만", 
+    "또한", "모든", "가장", "어떤", "이러한", "저러한", "매우", "많은", "많고", "같은", 
+    "같고", "처럼", "보다", "부터", "까지", "주며", "주고", "따라", "따른", "기반", "기반으로"
+  ]);
+
+  // 관련 도서 로드 (분야 불문 크로스 카테고리 콘텐츠 기반 필터링 + 가중치 스코어링 + 풀 격리)
   useEffect(() => {
     if (book) {
       const allBooksData = [
@@ -149,10 +157,17 @@ function BookDetailContent({ id }: { id: string }) {
         return isRealBook ? isBReal : !isBReal;
       });
 
-      // 같은 카테고리 도서 필터링 (자기 자신 제외)
-      const sameCategory = candidates.filter((b) => b.category === book.category && b.id !== book.id);
+      // 1. 제목에서 핵심 키워드(단어 길이 >= 2, 불용어 제외) 추출
+      const titleKeywords = book.title
+        .split(/[^a-zA-Z0-9가-힣]+/)
+        .filter((w) => w.length >= 2 && !KOREAN_STOP_WORDS.has(w));
 
-      // 문자열 시드를 기반으로 0~1 사이의 일관된 난수를 생성하는 유틸리티 (결정론적 셔플용)
+      // 2. 설명문(Description)에서 핵심 키워드 추출
+      const descKeywords = book.description
+        .split(/[^a-zA-Z0-9가-힣]+/)
+        .filter((w) => w.length >= 2 && !KOREAN_STOP_WORDS.has(w));
+
+      // 문자열 시드를 기반으로 난수를 생성하는 유틸리티
       const getSeededRandom = (seed: string) => {
         let h = 0;
         for (let i = 0; i < seed.length; i++) {
@@ -165,24 +180,70 @@ function BookDetailContent({ id }: { id: string }) {
         };
       };
 
-      const rng = getSeededRandom(book.id);
+      // 각 후보 도서별 연관성 점수 계산 (분야 불문 콘텐츠 유사도 위주 가중치)
+      const scoredCandidates = candidates
+        .filter((b) => b.id !== book.id)
+        .map((b) => {
+          let score = 0;
 
-      // 같은 카테고리 도서들을 결정론적으로 셔플
-      const shuffledSameCategory = [...sameCategory].sort(() => rng() - 0.5);
+          // 1) 저자 일치 (최고 우선순위 가중치)
+          if (b.author && book.author && b.author.replace(/\s+/g, "") === book.author.replace(/\s+/g, "")) {
+            score += 50;
+          }
 
-      let finalRelated = shuffledSameCategory.slice(0, 6);
+          // 2) 세부 주제(Subject) 매칭
+          if (b.subject && book.subject && (b.subject.includes(book.subject) || book.subject.includes(b.subject))) {
+            score += 40;
+          }
 
-      // 만약 같은 카테고리 연관도서가 6권 미만이면 다른 카테고리의 동일 풀 도서들로 채움
-      if (finalRelated.length < 6) {
-        const otherCategories = candidates.filter(
-          (b) => b.category !== book.category && b.id !== book.id
-        );
-        // 다른 카테고리 도서들도 동일한 시드로 셔플하여 순서 결정
-        const shuffledOthers = [...otherCategories].sort(() => rng() - 0.5);
-        
-        const needed = 6 - finalRelated.length;
-        finalRelated = [...finalRelated, ...shuffledOthers.slice(0, needed)];
-      }
+          // 3) 대분류 카테고리 일치 (가중치를 30으로 낮춰 타 분야 매칭의 진입 장벽 완화)
+          if (b.category === book.category) {
+            score += 30;
+          }
+
+          // 4) 수험서/전공서 등 유형 매칭
+          if (b.studyBookType && book.studyBookType && b.studyBookType === book.studyBookType) {
+            score += 20;
+          }
+
+          // 5) 제목 키워드 매칭
+          let titleMatchCount = 0;
+          titleKeywords.forEach((kw) => {
+            if (b.title.includes(kw)) titleMatchCount++;
+          });
+          score += Math.min(titleMatchCount * 20, 60); // 제목 매칭 최대 60점
+
+          // 6) 설명글 키워드 매칭
+          let descMatchCount = 0;
+          // 제목 키워드가 상대방 설명글에 등장하는 경우 (가중치 10)
+          titleKeywords.forEach((kw) => {
+            if (b.description.includes(kw)) descMatchCount += 2;
+          });
+          // 설명글 키워드가 상대방 설명글에 등장하는 경우 (가중치 5)
+          descKeywords.forEach((kw) => {
+            if (b.description.includes(kw)) descMatchCount += 1;
+          });
+          score += Math.min(descMatchCount * 5, 40); // 설명글 매칭 최대 40점
+
+          // 결정론적 타이 브레이커 (동점 시 도서 조합별 고유 순서 보장)
+          const rngForBook = getSeededRandom(book.id + b.id);
+          const tieBreaker = rngForBook();
+
+          return {
+            book: b,
+            score: score + tieBreaker,
+          };
+        });
+
+      // 점수 내림차순 정렬
+      const RELEVANCE_THRESHOLD = 50;
+      const sorted = scoredCandidates.sort((a, b) => b.score - a.score);
+
+      // 50점 이상 도서만 필터링 (최대 6권)
+      // 50점 이상이 없으면 점수 1위 도서 1권만 최소 보장
+      const highRelevance = sorted.filter((sc) => sc.score >= RELEVANCE_THRESHOLD);
+      const finalRelated = (highRelevance.length > 0 ? highRelevance.slice(0, 6) : sorted.slice(0, 1))
+        .map((sc) => sc.book);
 
       setRelatedBooks(finalRelated);
     }
@@ -526,7 +587,7 @@ function BookDetailContent({ id }: { id: string }) {
               <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>menu_book</span> 관련 추천 도서
             </h2>
           </div>
-          <div className="flex overflow-x-auto gap-6 pb-4 no-scrollbar">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
             {relatedBooks.map((relBook, i) => (
               <RelatedBookCard key={relBook.id} relBook={relBook} index={i} />
             ))}
