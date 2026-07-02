@@ -28,7 +28,7 @@ export default function AiPromoBanner() {
           </div>
         </div>
         <button
-          onClick={openModal}
+          onClick={() => openModal()}
           className="w-full md:w-auto h-12 px-xl bg-secondary-container text-on-secondary-container rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:opacity-90 transition-opacity whitespace-nowrap cursor-pointer"
         >
           지금 상담 시작
