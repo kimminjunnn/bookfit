@@ -106,7 +106,7 @@ export default function AiConsultModal() {
       />
 
       {/* Modal Container */}
-      <div className="fixed bg-white rounded-2xl z-50 flex flex-col overflow-hidden modal-panel-enter inset-0 m-auto w-full max-w-[600px] h-[95vh] max-h-[780px] shadow-[0_20px_60px_rgba(0,0,0,0.18)] border border-outline-variant/30">
+      <div className="fixed bg-white rounded-2xl z-50 flex flex-col overflow-hidden modal-panel-enter inset-0 m-auto w-[95%] md:w-full max-w-[760px] h-[620px] max-h-[94vh] shadow-[0_20px_60px_rgba(0,0,0,0.18)] border border-outline-variant/30">
         {/* Header */}
         <header className="bg-gradient-to-r from-primary to-[#005226] px-md h-[64px] flex justify-between items-center shrink-0 border-b border-white/10 shadow-sm">
           <div className="flex items-center gap-xs text-white">
@@ -114,7 +114,7 @@ export default function AiConsultModal() {
               auto_awesome
             </span>
             <span className="font-semibold text-[17px] tracking-tight text-white">
-              BookFit AI 도서 상담소
+              BookFit AI 독서 큐레이터
             </span>
           </div>
           <button
@@ -127,7 +127,7 @@ export default function AiConsultModal() {
         </header>
 
         {/* Modal Content Area */}
-        <div className="flex-1 overflow-y-auto no-scrollbar p-md space-y-md">
+        <div className="flex-1 overflow-y-auto no-scrollbar p-md flex flex-col">
           {status === "idle" && (
             <AiConsultForm onSubmit={handleFormSubmit} />
           )}
@@ -148,6 +148,20 @@ export default function AiConsultModal() {
             />
           )}
         </div>
+
+        {/* Fixed bottom footer — submit button, only shown on input screen */}
+        {status === "idle" && (
+          <div className="shrink-0 px-md pb-md pt-sm border-t border-outline-variant/40 bg-white rounded-b-2xl">
+            <button
+              type="submit"
+              form="ai-consult-form"
+              className="w-full h-11 bg-primary hover:bg-[#005226] text-white rounded-lg font-bold text-[14px] flex items-center justify-center gap-xs transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[16px]">auto_awesome</span>
+              책 추천받기
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
