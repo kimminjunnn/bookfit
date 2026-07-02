@@ -104,7 +104,7 @@ def fetch_kyobo_bestsellers(pages: list[int] = [1], timeout: float = 8.0) -> lis
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     for page in pages:
-        url = f"https://store.kyobobook.co.kr/api/gw/best/best-seller/online?page={page}&per=100&period=001&dsplDvsnCode=000&dsplTrgtDvsnCode=001"
+        url = f"https://store.kyobobook.co.kr/api/gw/best/best-seller/online?page={page}&per=200&period=001&dsplDvsnCode=000&dsplTrgtDvsnCode=001"
         try:
             print(f"[RAG-DataLoader] 교보 API 호출 중 (페이지 {page})...")
             response = requests.get(url, headers=headers, timeout=timeout)
@@ -172,7 +172,7 @@ def map_kyobo_newest_to_book(item: dict) -> dict:
 def fetch_kyobo_new_releases() -> list[dict]:
     import requests
     api_key = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..ZLYbgLboRn9J3QDp.A-YRBm6F9k1E7qI5iavgb0fVVjf3ssgmxnSkhW_hW_pTdNUpVjElQkaxXYjj1c0_5ycE4Sgl75QDatH5olqvIN35DPL8xmcQmH4ClipOkZ40xMMf0YXbj_vez5_z0mqXPL2_ysQu.6bVxg8WPbzFolcmHaf_-zw"
-    url = "https://store.kyobobook.co.kr/api/gw/pdt/v2/newest/md-pick/list?page=1&per=100&sort=rec&saleCmdtDvsnCode=KOR&soldOutExcludeYn=N&weekth=2026071"
+    url = "https://store.kyobobook.co.kr/api/gw/pdt/v2/newest/md-pick/list?page=1&per=200&sort=rec&saleCmdtDvsnCode=KOR&soldOutExcludeYn=N&weekth=2026071"
     headers = {
         "X-Api-Gw-Key": api_key,
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
