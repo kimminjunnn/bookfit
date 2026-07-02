@@ -5,10 +5,10 @@ import { Book } from "@/types/book";
 
 export async function GET() {
   try {
-    // Fetch live bestsellers (100 books)
+    // Fetch live bestsellers (up to 200 books)
     const books = await fetchKyoboBestsellers();
-    // Return only top 20 books for homepage display
-    return NextResponse.json(books.slice(0, 20));
+    // Return all fetched books to allow full client-side pagination/scrolling
+    return NextResponse.json(books);
   } catch (error) {
     console.warn("Failed to fetch Kyobo bestsellers, falling back to local dataset:", error);
     // Fallback: Use local mock books

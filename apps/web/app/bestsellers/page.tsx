@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Book, BookCategory } from "@/types/book";
 import BookCard from "@/components/BookCard";
 
@@ -25,19 +25,20 @@ export default function BestsellersPage() {
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<BookCategory | "전체">("전체");
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  
+  // 클라이언트 사이드 무한 스크롤을 위한 상태
+  const [visibleCount, setVisibleCount] = useState(20);
+  const triggerRef = useRef<HTMLDivElement | null>(null);
 
-  // 10행 기준 = 5열 * 10행 = 페이지당 50권
-  const pageSize = 50;
-
+  // 최초 1회 전체 데이터를 가져옴 (최대 200개)
   useEffect(() => {
     async function fetchBestsellers() {
       try {
+        setLoading(true);
         const res = await fetch("/api/bestsellers");
         if (res.ok) {
           const data = await res.json();
           setAllBooks(data);
-          setFilteredBooks(data);
         }
       } catch (err) {
         console.error("Failed to load bestsellers page data:", err);
@@ -48,29 +49,49 @@ export default function BestsellersPage() {
     fetchBestsellers();
   }, []);
 
-  // 카테고리 변경 시 페이지를 1페이지로 리셋
+  // 카테고리 변경 시 화면 리셋 및 필터링 적용
   const handleCategoryChange = (category: BookCategory | "전체") => {
     setSelectedCategory(category);
-    setCurrentPage(1);
-    if (category === "전체") {
+    setVisibleCount(20); // 노출 개수도 20개로 초기화
+  };
+
+  // 선택한 카테고리에 맞는 도서 필터링
+  useEffect(() => {
+    if (selectedCategory === "전체") {
       setFilteredBooks(allBooks);
     } else {
-      setFilteredBooks(allBooks.filter((book) => book.category === category));
+      setFilteredBooks(allBooks.filter((book) => book.category === selectedCategory));
     }
-  };
+  }, [allBooks, selectedCategory]);
 
-  // 페이지네이션 계산
-  const totalPages = Math.ceil(filteredBooks.length / pageSize);
-  const indexOfLastBook = currentPage * pageSize;
-  const indexOfFirstBook = indexOfLastBook - pageSize;
-  const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
+  // 스크롤이 끝에 도달하면 20개씩 더 디스플레이
+  useEffect(() => {
+    if (loading || filteredBooks.length <= visibleCount) return;
 
-  // 페이지 변경 핸들러
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    // 페이지 변경 시 부드럽게 상단으로 스크롤
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + 20, filteredBooks.length));
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTrigger = triggerRef.current;
+    if (currentTrigger) {
+      observer.observe(currentTrigger);
+    }
+
+    return () => {
+      if (currentTrigger) {
+        observer.unobserve(currentTrigger);
+      }
+    };
+  }, [loading, filteredBooks.length, visibleCount]);
+
+  // 현재 화면에 디스플레이할 도서 슬라이싱
+  const currentBooks = filteredBooks.slice(0, visibleCount);
+  const hasMore = filteredBooks.length > visibleCount;
 
   return (
     <div className="max-w-[1200px] w-full mx-auto px-gutter py-xl animate-fade-in">
@@ -138,11 +159,11 @@ export default function BestsellersPage() {
           </button>
         </div>
       ) : (
-        /* 도서 리스트 그리드 및 페이지 네비게이션 */
+        /* 도서 리스트 그리드 */
         <div>
           <div className="flex justify-between items-center mb-md">
             <span className="text-[14px] text-on-surface-variant">
-              총 <strong>{filteredBooks.length}</strong>권 중 {indexOfFirstBook + 1}-{Math.min(indexOfLastBook, filteredBooks.length)}권 표시
+              총 <strong>{filteredBooks.length}</strong>권 중 {currentBooks.length}권 표시됨
             </span>
           </div>
 
@@ -152,49 +173,31 @@ export default function BestsellersPage() {
                 key={book.id}
                 book={book}
                 variant="bestseller"
-                rank={indexOfFirstBook + i + 1}
+                rank={i + 1}
                 index={i}
                 discount={10}
               />
             ))}
           </div>
 
-          {/* 페이지 네비게이션 */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-xs mt-xl pt-lg border-t border-outline-variant">
-              <button
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="w-10 h-10 rounded-lg border border-outline-variant flex items-center justify-center bg-white text-on-surface hover:bg-surface transition-colors disabled:opacity-30 disabled:hover:bg-white cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[20px]">chevron_left</span>
-              </button>
+          {/* 무한 스크롤 트리거 & 추가 로드 상태 바 */}
+          {hasMore && (
+            <div
+              ref={triggerRef}
+              className="flex justify-center items-center py-xl mt-lg border-t border-outline-variant/30"
+            >
+              <div className="flex items-center gap-sm text-primary text-[14px] font-semibold animate-pulse">
+                <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+                <span>도서 더 가져오는 중...</span>
+              </div>
+            </div>
+          )}
 
-              {Array.from({ length: totalPages }).map((_, idx) => {
-                const pageNum = idx + 1;
-                const isCurrent = currentPage === pageNum;
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => handlePageChange(pageNum)}
-                    className={`w-10 h-10 rounded-lg border font-semibold text-[14px] transition-all cursor-pointer ${
-                      isCurrent
-                        ? "bg-primary text-white border-primary shadow-sm"
-                        : "bg-white text-on-surface border-outline-variant hover:bg-surface"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-
-              <button
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="w-10 h-10 rounded-lg border border-outline-variant flex items-center justify-center bg-white text-on-surface hover:bg-surface transition-colors disabled:opacity-30 disabled:hover:bg-white cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[20px]">chevron_right</span>
-              </button>
+          {!hasMore && filteredBooks.length > 0 && (
+            <div className="text-center py-xl mt-lg border-t border-outline-variant/30 text-on-surface-variant/50 text-[14px]">
+              모든 도서를 불러왔습니다. (최대 {filteredBooks.length}권)
             </div>
           )}
         </div>
