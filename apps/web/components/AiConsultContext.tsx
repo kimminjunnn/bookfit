@@ -5,7 +5,8 @@ import React, { createContext, useContext, useState } from "react";
 interface AiConsultContextType {
   isModalOpen: boolean;
   prefillText: string;
-  openModal: (prefill?: string) => void;
+  autoSubmit: boolean;
+  openModal: (prefill?: any, autoSubmit?: boolean) => void;
   closeModal: () => void;
 }
 
@@ -14,15 +15,20 @@ const AiConsultContext = createContext<AiConsultContextType | undefined>(undefin
 export function AiConsultProvider({ children }: { children: React.ReactNode }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [prefillText, setPrefillText] = useState("");
+  const [autoSubmit, setAutoSubmit] = useState(false);
 
-  const openModal = (prefill?: string) => {
-    setPrefillText(prefill ?? "");
+  const openModal = (prefill?: any, auto?: boolean) => {
+    setPrefillText(typeof prefill === "string" ? prefill : "");
+    setAutoSubmit(!!auto);
     setIsModalOpen(true);
   };
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setAutoSubmit(false);
+  };
 
   return (
-    <AiConsultContext.Provider value={{ isModalOpen, prefillText, openModal, closeModal }}>
+    <AiConsultContext.Provider value={{ isModalOpen, prefillText, autoSubmit, openModal, closeModal }}>
       {children}
     </AiConsultContext.Provider>
   );

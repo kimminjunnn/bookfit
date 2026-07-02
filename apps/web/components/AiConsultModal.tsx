@@ -9,7 +9,7 @@ import ErrorState from "./ErrorState";
 import { UserBookConsultInput, AiRecommendationResult } from "@/types/book";
 
 export default function AiConsultModal() {
-  const { isModalOpen, closeModal } = useAiConsult();
+  const { isModalOpen, prefillText, autoSubmit, closeModal } = useAiConsult();
   const [status, setStatus] = useState<"idle" | "loading" | "result" | "error">("idle");
   const [result, setResult] = useState<AiRecommendationResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -24,8 +24,6 @@ export default function AiConsultModal() {
       setLastInput(null);
     }
   }, [isModalOpen]);
-
-  if (!isModalOpen) return null;
 
   const handleFormSubmit = async (input: UserBookConsultInput) => {
     setLastInput(input);
@@ -53,6 +51,16 @@ export default function AiConsultModal() {
       setStatus("error");
     }
   };
+
+  // Handle autoSubmit from context
+  useEffect(() => {
+    if (isModalOpen && autoSubmit && prefillText.trim() && status === "idle") {
+      handleFormSubmit({
+        situation: prefillText.trim(),
+        freeText: prefillText.trim(),
+      });
+    }
+  }, [isModalOpen, autoSubmit, prefillText, status]);
 
   const handleRetry = () => {
     if (lastInput) {
@@ -97,6 +105,8 @@ export default function AiConsultModal() {
     }
   };
 
+  if (!isModalOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop/Overlay */}
@@ -129,7 +139,7 @@ export default function AiConsultModal() {
         {/* Modal Content Area */}
         <div className="flex-1 overflow-y-auto no-scrollbar p-md flex flex-col">
           {status === "idle" && (
-            <AiConsultForm onSubmit={handleFormSubmit} />
+            <AiConsultForm onSubmit={handleFormSubmit} initialSituation={prefillText} />
           )}
 
           {status === "loading" && (
