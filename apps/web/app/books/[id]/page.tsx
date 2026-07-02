@@ -124,7 +124,7 @@ function BookDetailContent({ id }: { id: string }) {
     loadBookData();
   }, [id]);
 
-  // 관련 도서 로드 (같은 카테고리 도서 필터링, 자기 자신 제외)
+  // 관련 도서 로드 (같은 카테고리 도서 필터링, 자기 자신 제외 + ID 시드 기반 결정론적 셔플 + 실존/가상 풀 완전 격리)
   useEffect(() => {
     if (book) {
       const allBooksData = [
@@ -134,12 +134,57 @@ function BookDetailContent({ id }: { id: string }) {
         ...dummyRecommendations,
         ...livePool,
       ];
-      const filtered = allBooksData.filter((b) => b.category === book.category && b.id !== book.id);
-      // 중복 제거
-      const unique = filtered.filter(
+
+      // 중복 도서 제거
+      const uniqueAll = allBooksData.filter(
         (value, index, self) => self.findIndex((t) => t.id === value.id) === index
       );
-      setRelatedBooks(unique.slice(0, 6));
+
+      // 현재 도서의 실존 여부 판별 (ID가 'S00' 또는 'kyobo'로 시작하는 경우)
+      const isRealBook = book.id.startsWith("S00") || book.id.startsWith("kyobo");
+
+      // 실존 상태(실제/가상)가 일치하는 도서만 풀로 설정 (가상 도서 완전 차단)
+      const candidates = uniqueAll.filter((b) => {
+        const isBReal = b.id.startsWith("S00") || b.id.startsWith("kyobo");
+        return isRealBook ? isBReal : !isBReal;
+      });
+
+      // 같은 카테고리 도서 필터링 (자기 자신 제외)
+      const sameCategory = candidates.filter((b) => b.category === book.category && b.id !== book.id);
+
+      // 문자열 시드를 기반으로 0~1 사이의 일관된 난수를 생성하는 유틸리티 (결정론적 셔플용)
+      const getSeededRandom = (seed: string) => {
+        let h = 0;
+        for (let i = 0; i < seed.length; i++) {
+          h = (h << 5) - h + seed.charCodeAt(i);
+          h |= 0;
+        }
+        return () => {
+          h = Math.sin(h) * 10000;
+          return h - Math.floor(h);
+        };
+      };
+
+      const rng = getSeededRandom(book.id);
+
+      // 같은 카테고리 도서들을 결정론적으로 셔플
+      const shuffledSameCategory = [...sameCategory].sort(() => rng() - 0.5);
+
+      let finalRelated = shuffledSameCategory.slice(0, 6);
+
+      // 만약 같은 카테고리 연관도서가 6권 미만이면 다른 카테고리의 동일 풀 도서들로 채움
+      if (finalRelated.length < 6) {
+        const otherCategories = candidates.filter(
+          (b) => b.category !== book.category && b.id !== book.id
+        );
+        // 다른 카테고리 도서들도 동일한 시드로 셔플하여 순서 결정
+        const shuffledOthers = [...otherCategories].sort(() => rng() - 0.5);
+        
+        const needed = 6 - finalRelated.length;
+        finalRelated = [...finalRelated, ...shuffledOthers.slice(0, needed)];
+      }
+
+      setRelatedBooks(finalRelated);
     }
   }, [book, livePool]);
 
