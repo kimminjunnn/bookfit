@@ -1,226 +1,444 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useAiConsult } from "./AiConsultContext";
+
+interface Slide {
+  id: number;
+  tag: string;
+  tagColor: string;
+  tagTextColor: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  cta?: string;
+  ctaStyle: string;
+  bgImage: string;
+  overlayGradient: string;
+  accentColor: string;
+  rightVisual: "book" | "trophy" | "store" | "none";
+}
+
+const slides: Slide[] = [
+  {
+    id: 0,
+    tag: "이벤트",
+    tagColor: "bg-[#F97316]",
+    tagTextColor: "text-white",
+    title: "독서의 달 기념\n전 도서 10% 적립",
+    subtitle: "7월 한 달간",
+    description:
+      "가을의 시작을 책과 함께하세요.\n모든 도서 구매 시 포인트 혜택을 드립니다.",
+    cta: "이벤트 보기",
+    ctaStyle:
+      "bg-[#F97316] text-white hover:bg-[#ea6a08] shadow-[0_0_24px_rgba(249,115,22,0.5)]",
+    bgImage: "/banner-slide1.png",
+    overlayGradient:
+      "linear-gradient(105deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.1) 100%)",
+    accentColor: "#F97316",
+    rightVisual: "none",
+  },
+  {
+    id: 1,
+    tag: "신작 출시",
+    tagColor: "bg-[#0EA5E9]",
+    tagTextColor: "text-white",
+    title: "올해의 화제작\n내 몸 건강 진단서",
+    subtitle: "2025 베스트셀러",
+    description:
+      "몸이 보내는 신호, 부위별로 점검하기.\n당신의 건강을 위한 필독서가 출시되었습니다.",
+    cta: "자세히 보기",
+    ctaStyle:
+      "bg-[#0EA5E9] text-white hover:bg-[#0284c7] shadow-[0_0_24px_rgba(14,165,233,0.5)]",
+    bgImage: "/banner-slide2.png",
+    overlayGradient:
+      "linear-gradient(105deg, rgba(2,12,30,0.88) 0%, rgba(2,12,30,0.65) 50%, rgba(2,12,30,0.15) 100%)",
+    accentColor: "#0EA5E9",
+    rightVisual: "book",
+  },
+  {
+    id: 2,
+    tag: "공모전",
+    tagColor: "bg-[#EAB308]",
+    tagTextColor: "text-black",
+    title: "제1회 BookFit AI\n독후감 공모전",
+    subtitle: "총 상금 500만원",
+    description:
+      "AI와 함께하는 새로운 독서 경험.\n당신만의 이야기를 들려주세요.",
+    cta: "지금 참여하기",
+    ctaStyle:
+      "bg-[#EAB308] text-black hover:bg-[#ca9a07] shadow-[0_0_24px_rgba(234,179,8,0.5)]",
+    bgImage: "/banner-slide3.png",
+    overlayGradient:
+      "linear-gradient(105deg, rgba(20,10,40,0.85) 0%, rgba(20,10,40,0.60) 50%, rgba(20,10,40,0.1) 100%)",
+    accentColor: "#EAB308",
+    rightVisual: "trophy",
+  },
+  {
+    id: 3,
+    tag: "서비스 안내",
+    tagColor: "bg-[#22C55E]",
+    tagTextColor: "text-white",
+    title: "바로드림 서비스\n이용 안내",
+    subtitle: "30분 내 픽업 보장",
+    description:
+      "온라인으로 주문하고 매장에서 바로 픽업!\n더 빠르고 편리한 독서 생활을 경험하세요.",
+    cta: "이용방법 확인",
+    ctaStyle:
+      "bg-[#22C55E] text-white hover:bg-[#16a34a] shadow-[0_0_24px_rgba(34,197,94,0.5)]",
+    bgImage: "/banner-slide4.png",
+    overlayGradient:
+      "linear-gradient(105deg, rgba(0,20,10,0.82) 0%, rgba(0,20,10,0.55) 50%, rgba(0,20,10,0.1) 100%)",
+    accentColor: "#22C55E",
+    rightVisual: "store",
+  },
+];
+
+const SLIDE_DURATION = 5000;
 
 export default function HeroBanner() {
   const { openModal } = useAiConsult();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [prevSlide, setPrevSlide] = useState<number | null>(null);
+  const [direction, setDirection] = useState<"next" | "prev">("next");
   const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const slideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const totalSlides = 4;
+  const goToSlide = useCallback(
+    (index: number, dir: "next" | "prev" = "next") => {
+      if (isAnimating || index === currentSlide) return;
+      setIsAnimating(true);
+      setDirection(dir);
+      setPrevSlide(currentSlide);
+      setCurrentSlide(index);
+      setProgress(0);
+      setTimeout(() => {
+        setPrevSlide(null);
+        setIsAnimating(false);
+      }, 700);
+    },
+    [isAnimating, currentSlide]
+  );
 
+  const goNext = useCallback(() => {
+    const next = (currentSlide + 1) % slides.length;
+    goToSlide(next, "next");
+  }, [currentSlide, goToSlide]);
+
+  const goPrev = useCallback(() => {
+    const prev = (currentSlide - 1 + slides.length) % slides.length;
+    goToSlide(prev, "prev");
+  }, [currentSlide, goToSlide]);
+
+  // Progress bar
   useEffect(() => {
-    if (isPaused) return;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % totalSlides);
-    }, 4500);
-    return () => clearInterval(interval);
+    if (isPaused) {
+      if (progressInterval.current) clearInterval(progressInterval.current);
+      return;
+    }
+    progressInterval.current = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 100) return 0;
+        return p + 100 / (SLIDE_DURATION / 50);
+      });
+    }, 50);
+    return () => {
+      if (progressInterval.current) clearInterval(progressInterval.current);
+    };
   }, [isPaused, currentSlide]);
 
-  const handlePrev = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-  };
+  // Auto advance
+  useEffect(() => {
+    if (isPaused) return;
+    slideTimer.current = setTimeout(() => {
+      goNext();
+    }, SLIDE_DURATION);
+    return () => {
+      if (slideTimer.current) clearTimeout(slideTimer.current);
+    };
+  }, [isPaused, currentSlide, goNext]);
 
-  const handleNext = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides);
-  };
-
-  const handlePlayPause = () => {
-    setIsPaused((prev) => !prev);
-  };
-
-  const handleDotClick = (index: number) => {
-    setCurrentSlide(index);
+  const handleCta = (slideId: number) => {
+    if (slideId === 2) openModal();
   };
 
   return (
-    <section className="mt-xl relative w-full h-[400px] rounded-xl overflow-hidden group">
-      {/* Background Layer */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          alt="Banner Background"
-          fill
-          priority
-          className="object-cover"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuALVxtc0-34KUwU55RNlS0sXGElOn0CTnvhnD1IAHa1nK5zGugY2_dS2DW6ThSa526qcr1Vp1uy_6pSceuID3WopkWl_S_-yJRNQFl5zN3nLSgI8momCk0ebgLSEZ5Tn0zY6LhGaaj4T1Un0qRhIZnDJQTOAKimWR5X4mOXCUMiq-sk2cNn88DnInIDFz43xTLwX6Jk6lu641P_E3i8gjHzHqWze1OdvVqDMMPRvHTu0lDYq4Cifb5ZZ8C7A9A4npjik_CENfqewuE"
-        />
-        <div className="absolute inset-0 bg-black/40"></div>
-      </div>
+    <section
+      className="mt-xl relative w-full rounded-2xl overflow-hidden group"
+      style={{ height: "440px" }}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Slides */}
+      {slides.map((slide, idx) => {
+        const isCurrent = idx === currentSlide;
+        const isPrev = idx === prevSlide;
 
-      {/* Slides Container */}
-      <div className="relative h-full z-10">
-        {/* Slide 1: Event */}
-        <div
-          className={`hero-slide absolute inset-0 flex items-center px-xl transition-opacity duration-1000 ${
-            currentSlide === 0 ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
-          }`}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 w-full items-center gap-xl">
-            <div className="text-white">
-              <span className="inline-block px-2 py-1 bg-primary rounded text-[13px] font-medium tracking-[0.01em] mb-sm">
-                이벤트
-              </span>
-              <h1 className="text-[32px] font-bold leading-tight mb-md">
-                독서의 달 기념
-                <br />
-                전 도서 10% 적립
-              </h1>
-              <p className="text-[15px] leading-[1.6] opacity-90 mb-xl">
-                가을의 시작을 책과 함께하세요. 모든 도서 구매 시 포인트 혜택을 드립니다.
-              </p>
-            </div>
-          </div>
-        </div>
+        let translateClass = "translate-x-full";
+        if (isCurrent) translateClass = "translate-x-0";
+        else if (isPrev) {
+          translateClass = direction === "next" ? "-translate-x-full" : "translate-x-full";
+        }
 
-        {/* Slide 2: New Release */}
-        <div
-          className={`hero-slide absolute inset-0 flex items-center px-xl transition-opacity duration-1000 ${
-            currentSlide === 1 ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
-          }`}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 w-full items-center gap-xl">
-            <div className="text-white">
-              <span className="inline-block px-2 py-1 bg-secondary rounded text-[13px] font-medium tracking-[0.01em] mb-sm">
-                신작출시
-              </span>
-              <h1 className="text-[32px] font-bold leading-tight mb-md">
-                올해의 화제작:
-                <br />
-                내 몸 건강 진단서
-              </h1>
-              <p className="text-[15px] leading-[1.6] opacity-90 mb-xl">
-                몸이 보내는 신호, 부위별 점검하기. 당신의 건강을 위한 필독서.
-              </p>
-              <button className="bg-secondary text-white px-xl py-md rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:scale-[1.02] transition-transform shadow-md cursor-pointer">
-                자세히 보기
-              </button>
-            </div>
-            <div className="hidden md:flex justify-center relative h-[340px] w-[280px]">
+        return (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 transition-transform duration-700 ease-in-out ${translateClass} ${
+              !isCurrent && !isPrev ? "hidden" : ""
+            }`}
+          >
+            {/* Background Image */}
+            <div className="absolute inset-0">
               <Image
-                alt="Book Cover"
+                src={slide.bgImage}
+                alt={slide.title}
                 fill
-                className="object-contain rounded-lg shadow-2xl"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSxmT3YmjjcU_3HcXA36bkkv64_GCSUKSV0mm08EFNxlMjE3B-_j_TKieltsjxaIvvKPPYQIzFAZl155bH3KkKMZCS3ZVhe3d7UrXuszS1qRZ0KfMr6MFAS6Kw60MsPsghshDv-YobW1ljHjFSnioknYQWetVPjtceREh2jh5vQurtiVi6XQEP0UnCKXpnXAafII7efaP44kDKdSBk6-J1YMNIXl9xwaGBK-S3maoEnrmbZA4e-0TXBW2BtaO1iUcd0kL73Du3hfo"
-                sizes="(max-width: 768px) 100vw, 280px"
+                priority={idx === 0}
+                className="object-cover"
+                sizes="(max-width: 1200px) 100vw, 1200px"
+              />
+              {/* Gradient Overlay */}
+              <div
+                className="absolute inset-0"
+                style={{ background: slide.overlayGradient }}
               />
             </div>
-          </div>
-        </div>
 
-        {/* Slide 3: Contest */}
-        <div
-          className={`hero-slide absolute inset-0 flex items-center px-xl transition-opacity duration-1000 ${
-            currentSlide === 2 ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
-          }`}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 w-full items-center gap-xl">
-            <div className="text-white">
-              <span className="inline-block px-2 py-1 bg-[#FFD700] text-on-surface rounded text-[13px] font-medium tracking-[0.01em] mb-sm">
-                공모전
-              </span>
-              <h1 className="text-[32px] font-bold leading-tight mb-md">
-                제1회 BookFit AI
-                <br />
-                독후감 공모전
-              </h1>
-              <p className="text-[15px] leading-[1.6] opacity-90 mb-xl">
-                AI와 함께하는 새로운 독서 경험. 당신의 이야기를 들려주세요.
-              </p>
-              <button
-                onClick={() => openModal()}
-                className="bg-[#FFD700] text-on-surface px-xl py-md rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:scale-[1.02] transition-transform shadow-md cursor-pointer"
-              >
-                참여하기
-              </button>
-            </div>
-            <div className="hidden md:flex justify-center">
-              <div className="w-[280px] h-[360px] bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[120px] text-[#FFD700]">
-                  trophy
-                </span>
+            {/* Slide Content */}
+            <div className="relative z-10 h-full flex items-center px-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 w-full items-center gap-8">
+                {/* Left: Text */}
+                <div className="text-white">
+                  {/* Tag */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <span
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase ${slide.tagColor} ${slide.tagTextColor}`}
+                    >
+                      {slide.tag}
+                    </span>
+                    {slide.subtitle && (
+                      <span className="text-white/60 text-[13px] font-medium">
+                        {slide.subtitle}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Title */}
+                  <h2
+                    className="font-extrabold leading-[1.15] mb-4"
+                    style={{
+                      fontSize: "clamp(26px, 3vw, 38px)",
+                      textShadow: "0 2px 20px rgba(0,0,0,0.4)",
+                      whiteSpace: "pre-line",
+                    }}
+                  >
+                    {slide.title}
+                  </h2>
+
+                  {/* Description */}
+                  <p
+                    className="text-white/80 mb-6 leading-relaxed"
+                    style={{
+                      fontSize: "clamp(13px, 1.5vw, 15px)",
+                      whiteSpace: "pre-line",
+                    }}
+                  >
+                    {slide.description}
+                  </p>
+
+                  {/* CTA Button */}
+                  {slide.cta && (
+                    <button
+                      onClick={() => handleCta(slide.id)}
+                      className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-[14px] font-bold transition-all duration-200 hover:scale-[1.04] active:scale-[0.98] cursor-pointer ${slide.ctaStyle}`}
+                    >
+                      {slide.cta}
+                      <span className="material-symbols-outlined text-[18px]">
+                        arrow_forward
+                      </span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Right: Visual */}
+                <div className="hidden md:flex justify-end items-center pr-4">
+                  {slide.rightVisual === "book" && (
+                    <div
+                      className="relative w-[200px] h-[300px]"
+                      style={{
+                        filter: "drop-shadow(0 20px 60px rgba(0,0,0,0.6))",
+                        transform: "perspective(800px) rotateY(-8deg) rotateX(2deg)",
+                      }}
+                    >
+                      <Image
+                        src={slide.bgImage}
+                        alt="신작 도서"
+                        fill
+                        className="object-cover rounded-lg"
+                        sizes="200px"
+                      />
+                      <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 to-transparent" />
+                    </div>
+                  )}
+                  {slide.rightVisual === "trophy" && (
+                    <div className="flex flex-col items-center gap-3">
+                      <div
+                        className="w-[180px] h-[220px] rounded-2xl flex flex-col items-center justify-center gap-2"
+                        style={{
+                          background:
+                            "linear-gradient(135deg, rgba(234,179,8,0.2), rgba(234,179,8,0.05))",
+                          border: "1px solid rgba(234,179,8,0.3)",
+                          backdropFilter: "blur(12px)",
+                          boxShadow:
+                            "0 0 60px rgba(234,179,8,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
+                        }}
+                      >
+                        <span className="material-symbols-outlined text-[72px] text-[#EAB308]">
+                          emoji_events
+                        </span>
+                        <div className="text-center">
+                          <div className="text-[#EAB308] font-bold text-[13px]">
+                            총 상금
+                          </div>
+                          <div className="text-white font-extrabold text-[20px]">
+                            500만원
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        {["🥇 1등", "🥈 2등", "🥉 3등"].map((award) => (
+                          <span
+                            key={award}
+                            className="px-2 py-1 rounded-full text-[11px] font-medium text-white/80"
+                            style={{
+                              background: "rgba(255,255,255,0.1)",
+                              backdropFilter: "blur(8px)",
+                            }}
+                          >
+                            {award}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {slide.rightVisual === "store" && (
+                    <div
+                      className="w-[200px] h-[240px] rounded-2xl flex flex-col items-center justify-center gap-4"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05))",
+                        border: "1px solid rgba(34,197,94,0.25)",
+                        backdropFilter: "blur(12px)",
+                        boxShadow: "0 0 60px rgba(34,197,94,0.15), inset 0 1px 0 rgba(255,255,255,0.1)",
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-[64px] text-[#22C55E]">
+                        storefront
+                      </span>
+                      <div className="text-center px-4">
+                        <div className="text-white font-bold text-[14px] mb-1">
+                          매장 즉시 픽업
+                        </div>
+                        <div className="text-white/60 text-[12px] leading-relaxed">
+                          온라인 결제 후<br />30분 내 수령 가능
+                        </div>
+                      </div>
+                      <div
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold text-[#22C55E]"
+                        style={{ background: "rgba(34,197,94,0.15)" }}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
+                        전국 120개 매장 운영중
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        );
+      })}
 
-        {/* Slide 4: Notice */}
-        <div
-          className={`hero-slide absolute inset-0 flex items-center px-xl transition-opacity duration-1000 ${
-            currentSlide === 3 ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
-          }`}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 w-full items-center gap-xl">
-            <div className="text-white">
-              <span className="inline-block px-2 py-1 bg-white/20 rounded text-[13px] font-medium tracking-[0.01em] mb-sm">
-                안내
-              </span>
-              <h1 className="text-[32px] font-bold leading-tight mb-md">
-                바로드림 서비스
-                <br />
-                이용 안내
-              </h1>
-              <p className="text-[15px] leading-[1.6] opacity-90 mb-xl">
-                온라인 주문 후 매장에서 바로 픽업! 더 빠르고 편리한 독서 생활.
-              </p>
-              <button className="bg-white text-primary px-xl py-md rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:scale-[1.02] transition-transform shadow-md cursor-pointer">
-                이용방법 확인
-              </button>
-            </div>
-            <div className="hidden md:flex justify-center">
-              <div className="w-[280px] h-[360px] bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[120px] text-white">
-                  local_shipping
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Pagination Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-xs z-20">
-        {Array.from({ length: totalSlides }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => handleDotClick(i)}
-            className={`w-2 h-2 rounded-full transition-colors duration-500 cursor-pointer ${
-              currentSlide === i ? "bg-white" : "bg-white/40"
-            }`}
-            aria-label={`슬라이드 ${i + 1} 보기`}
+      {/* Bottom Controls */}
+      <div className="absolute bottom-0 left-0 right-0 z-20">
+        {/* Progress Bar */}
+        <div className="h-[3px] bg-white/20">
+          <div
+            className="h-full bg-white transition-none"
+            style={{ width: `${progress}%`, opacity: isPaused ? 0.4 : 1 }}
           />
-        ))}
-      </div>
+        </div>
 
-      {/* Slide Controls */}
-      <div className="absolute bottom-6 right-gutter flex items-center gap-xs z-20 bg-black/30 backdrop-blur-sm rounded-full px-sm py-1">
-        <button
-          onClick={handlePrev}
-          className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors cursor-pointer"
-          id="hero-prev"
-          aria-label="이전 슬라이드"
+        <div
+          className="flex items-center justify-between px-6 py-3"
+          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)" }}
         >
-          <span className="material-symbols-outlined text-[20px]">chevron_left</span>
-        </button>
-        <button
-          onClick={handlePlayPause}
-          className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors cursor-pointer"
-          id="hero-play-pause"
-          aria-label={isPaused ? "재생" : "일시정지"}
-        >
-          <span className="material-symbols-outlined text-[20px]">
-            {isPaused ? "play_arrow" : "pause"}
-          </span>
-        </button>
-        <button
-          onClick={handleNext}
-          className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors cursor-pointer"
-          id="hero-next"
-          aria-label="다음 슬라이드"
-        >
-          <span className="material-symbols-outlined text-[20px]">chevron_right</span>
-        </button>
+          {/* Slide Indicators */}
+          <div className="flex items-center gap-2">
+            {slides.map((slide, i) => (
+              <button
+                key={i}
+                onClick={() =>
+                  goToSlide(i, i > currentSlide ? "next" : "prev")
+                }
+                className="group/dot flex items-center gap-1.5 cursor-pointer"
+                aria-label={`슬라이드 ${i + 1} 보기`}
+              >
+                <div
+                  className={`h-[3px] rounded-full transition-all duration-500 ${
+                    currentSlide === i ? "w-6" : "w-2 opacity-50"
+                  }`}
+                  style={{
+                    background:
+                      currentSlide === i ? slide.accentColor : "white",
+                  }}
+                />
+              </button>
+            ))}
+            <span className="text-white/50 text-[12px] ml-1 font-mono">
+              {String(currentSlide + 1).padStart(2, "0")} /{" "}
+              {String(slides.length).padStart(2, "0")}
+            </span>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={goPrev}
+              id="hero-prev"
+              aria-label="이전 슬라이드"
+              className="w-8 h-8 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 rounded-full transition-all cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                chevron_left
+              </span>
+            </button>
+            <button
+              onClick={() => setIsPaused((p) => !p)}
+              id="hero-play-pause"
+              aria-label={isPaused ? "재생" : "일시정지"}
+              className="w-8 h-8 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 rounded-full transition-all cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                {isPaused ? "play_arrow" : "pause"}
+              </span>
+            </button>
+            <button
+              onClick={goNext}
+              id="hero-next"
+              aria-label="다음 슬라이드"
+              className="w-8 h-8 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 rounded-full transition-all cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                chevron_right
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
