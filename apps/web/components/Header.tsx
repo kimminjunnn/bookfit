@@ -2,9 +2,18 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const pathname = usePathname();
+
+  const getLinkClass = (path: string) => {
+    const isActive = pathname === path;
+    return isActive
+      ? "text-primary font-bold border-b-2 border-primary pb-1 text-[15px] tracking-[0.02em]"
+      : "text-on-surface-variant text-[15px] font-semibold tracking-[0.02em] hover:text-primary transition-colors pb-1";
+  };
 
   return (
     <nav className="sticky top-0 h-[72px] w-full bg-white border-b border-outline-variant z-50">
@@ -33,28 +42,16 @@ export default function Header() {
             </div>
           </Link>
           <div className="hidden md:flex items-center gap-lg">
-            <Link
-              href="/"
-              className="text-primary font-bold border-b-2 border-primary pb-1 text-[15px] tracking-[0.02em]"
-            >
+            <Link href="/" className={getLinkClass("/")}>
               홈
             </Link>
-            <Link
-              href="#"
-              className="text-on-surface-variant text-[15px] font-semibold tracking-[0.02em] hover:text-primary transition-colors"
-            >
+            <Link href="/#category-section" className="text-on-surface-variant text-[15px] font-semibold tracking-[0.02em] hover:text-primary transition-colors pb-1">
               카테고리
             </Link>
-            <Link
-              href="#"
-              className="text-on-surface-variant text-[15px] font-semibold tracking-[0.02em] hover:text-primary transition-colors"
-            >
+            <Link href="/bestsellers" className={getLinkClass("/bestsellers")}>
               베스트셀러
             </Link>
-            <Link
-              href="#"
-              className="text-on-surface-variant text-[15px] font-semibold tracking-[0.02em] hover:text-primary transition-colors"
-            >
+            <Link href="/new-releases" className={getLinkClass("/new-releases")}>
               신간
             </Link>
           </div>

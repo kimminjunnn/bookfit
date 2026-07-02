@@ -26,7 +26,7 @@ export default function CategoryFilter({ onCategoryChange }: CategoryFilterProps
   };
 
   return (
-    <section className="mt-section">
+    <section id="category-section" className="mt-section">
       <div className="flex items-center gap-sm overflow-x-auto no-scrollbar py-base">
         {CATEGORIES.map((cat) => (
           <button
