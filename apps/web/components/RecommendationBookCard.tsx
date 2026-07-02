@@ -37,7 +37,7 @@ export default function RecommendationBookCard({
     }
   }, [recommendedBook.id]);
 
-  const bookTitle = recommendedBook.title || fullBook?.title;
+  const bookTitle = recommendedBook.title || fullBook?.title || "도서 이미지";
   const author = recommendedBook.author || recommendedBook.author || fullBook?.author || "";
   const price = recommendedBook.price || fullBook?.price;
   const category = recommendedBook.category || fullBook?.category;

@@ -129,7 +129,7 @@ export default function HeroBanner() {
                 AI와 함께하는 새로운 독서 경험. 당신의 이야기를 들려주세요.
               </p>
               <button
-                onClick={openModal}
+                onClick={() => openModal()}
                 className="bg-[#FFD700] text-on-surface px-xl py-md rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:scale-[1.02] transition-transform shadow-md cursor-pointer"
               >
                 참여하기

@@ -107,7 +107,8 @@ export async function POST(request: Request) {
     const body: UserBookConsultInput = await request.json();
     
     // FastAPI URL 환경변수 (로컬 기본값: http://localhost:8000)
-    const FASTAPI_BASE_URL = process.env.FASTAPI_BASE_URL || "http://localhost:8000";
+    // 끝에 슬래시가 있을 경우 자동 제거 (//recommend 이중 슬래시 방지)
+    const FASTAPI_BASE_URL = (process.env.FASTAPI_BASE_URL || "http://localhost:8000").replace(/\/$/, "");
     
     console.log(`[Next.js API Proxy] FastAPI 서버(${FASTAPI_BASE_URL}/recommend) 호출 시도 중...`);
     

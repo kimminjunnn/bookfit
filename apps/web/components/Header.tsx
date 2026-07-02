@@ -1,12 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useCallback } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import SearchAutocomplete from "./SearchAutocomplete";
 
 export default function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const [searchVal, setSearchVal] = useState("");
+  const [mobileSearchVal, setMobileSearchVal] = useState("");
+  const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+  const [mobileAutocompleteOpen, setMobileAutocompleteOpen] = useState(false);
+
+  const handleSearchSubmit = (e: React.FormEvent, val: string) => {
+    e.preventDefault();
+    if (val.trim()) {
+      setAutocompleteOpen(false);
+      setMobileAutocompleteOpen(false);
+      router.push(`/search?q=${encodeURIComponent(val.trim())}`);
+    }
+  };
+
+  const closeAutocomplete = useCallback(() => setAutocompleteOpen(false), []);
+  const closeMobileAutocomplete = useCallback(() => setMobileAutocompleteOpen(false), []);
 
   const getLinkClass = (path: string) => {
     const isActive = pathname === path;
@@ -43,14 +61,31 @@ export default function Header() {
         {/* 검색바 + 아이콘 */}
         <div className="flex items-center gap-md">
           <div className="relative hidden sm:block">
-            <input
-              type="text"
-              placeholder="제목, 저자, 출판사 검색"
-              className="w-[320px] h-12 px-md pl-10 rounded-lg border border-outline-variant bg-[#F5F5F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-[15px]"
-            />
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              search
-            </span>
+            <form onSubmit={(e) => handleSearchSubmit(e, searchVal)}>
+              <input
+                type="text"
+                placeholder="제목, 저자, 출판사 검색"
+                value={searchVal}
+                onChange={(e) => {
+                  setSearchVal(e.target.value);
+                  setAutocompleteOpen(e.target.value.trim().length >= 2);
+                }}
+                onFocus={() => {
+                  if (searchVal.trim().length >= 2) setAutocompleteOpen(true);
+                }}
+                className="w-[320px] h-12 px-md pl-10 rounded-lg border border-outline-variant bg-[#F5F5F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-[15px]"
+                autoComplete="off"
+              />
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
+                search
+              </span>
+            </form>
+            {autocompleteOpen && (
+              <SearchAutocomplete
+                query={searchVal}
+                onClose={closeAutocomplete}
+              />
+            )}
           </div>
 
           {/* 모바일 검색 토글 */}
@@ -75,15 +110,32 @@ export default function Header() {
       {mobileSearchOpen && (
         <div className="sm:hidden px-gutter pb-sm bg-white border-b border-outline-variant">
           <div className="relative">
-            <input
-              type="text"
-              placeholder="제목, 저자, 출판사 검색"
-              className="w-full h-12 px-md pl-10 rounded-lg border border-outline-variant bg-[#F5F5F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-[15px]"
-              autoFocus
-            />
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              search
-            </span>
+            <form onSubmit={(e) => {
+              handleSearchSubmit(e, mobileSearchVal);
+              setMobileSearchOpen(false);
+            }}>
+              <input
+                type="text"
+                placeholder="제목, 저자, 출판사 검색"
+                value={mobileSearchVal}
+                onChange={(e) => {
+                  setMobileSearchVal(e.target.value);
+                  setMobileAutocompleteOpen(e.target.value.trim().length >= 2);
+                }}
+                className="w-full h-12 px-md pl-10 rounded-lg border border-outline-variant bg-[#F5F5F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-[15px]"
+                autoFocus
+                autoComplete="off"
+              />
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
+                search
+              </span>
+            </form>
+            {mobileAutocompleteOpen && (
+              <SearchAutocomplete
+                query={mobileSearchVal}
+                onClose={closeMobileAutocomplete}
+              />
+            )}
           </div>
         </div>
       )}
