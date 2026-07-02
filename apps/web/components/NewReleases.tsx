@@ -26,6 +26,9 @@ export default function NewReleases() {
     loadNewReleases();
   }, []);
 
+  // 메인 화면에는 상위 10개만 표시 (5열 × 2행)
+  const displayBooks = books.slice(0, 10);
+
   if (loading) {
     return (
       <section className="mt-section">
@@ -34,11 +37,12 @@ export default function NewReleases() {
             신간 도서
           </h2>
         </div>
-        <div className="flex gap-lg overflow-x-auto no-scrollbar pb-md">
-          {Array.from({ length: 8 }).map((_, i) => (
+        {/* 5열 × 2행 스켈레톤 */}
+        <div className="grid grid-cols-5 gap-lg">
+          {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
-              className="flex-shrink-0 w-[160px] aspect-[3/4] bg-surface border border-outline-variant rounded-lg animate-pulse"
+              className="aspect-[3/4] w-full bg-surface border border-outline-variant rounded-lg animate-pulse"
             />
           ))}
         </div>
@@ -62,8 +66,9 @@ export default function NewReleases() {
           </span>
         </Link>
       </div>
-      <div className="flex gap-lg overflow-x-auto no-scrollbar pb-md">
-        {books.map((book, i) => (
+      {/* 5열 × 2행 그리드 */}
+      <div className="grid grid-cols-5 gap-lg">
+        {displayBooks.map((book, i) => (
           <BookCard key={book.id} book={book} variant="new-release" index={i} />
         ))}
       </div>

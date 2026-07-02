@@ -12,7 +12,7 @@ export async function GET() {
       "Failed to fetch Kyobo new releases, falling back to local dataset:",
       error
     );
-    // Fallback: use the first 20 books from local mock data
-    return NextResponse.json((booksData as Book[]).slice(0, 20));
+    // Fallback: use the first 100 books from local mock data
+    return NextResponse.json((booksData as Book[]).slice(0, 100));
   }
 }

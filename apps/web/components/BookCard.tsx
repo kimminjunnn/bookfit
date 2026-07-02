@@ -84,7 +84,7 @@ function BookCover({
 /** 신간 도서 카드 */
 function NewReleaseCard({ book, index = 0 }: BookCardProps) {
   return (
-    <Link href={`/books/${book.id}`} className="min-w-[180px] md:min-w-[220px] group block">
+    <Link href={`/books/${book.id}`} className="group block w-full">
       <div className="relative aspect-[3/4] w-full rounded-lg bg-surface border border-outline-variant shadow-sm overflow-hidden mb-sm transition-transform group-hover:-translate-y-1">
         <BookCover book={book} index={index} />
       </div>
