@@ -1,6 +1,6 @@
 # CLAUDE.md — BookFit
 
-RAG 기반 AI 도서 상담 서비스. 교보문고 클론 위에 "상황을 자연어로 입력하면 도서 데이터 근거로 책을 추천"하는 기능을 얹은 **7일 스프린트 데모데이 MVP**다. (PRD: `BookFit_PRD_v1.3.md`)
+RAG 기반 AI 도서 상담 서비스. 교보문고 클론 위에 "상황을 자연어로 입력하면 도서 데이터 근거로 책을 추천"하는 기능을 얹은 **7일 스프린트 데모데이 MVP**다. (PRD: `BookFit_PRD_v1.4.md`)
 
 ## 최우선 목표 (이 흐름을 항상 지킨다)
 
@@ -10,24 +10,27 @@ AI 도서 상담 입력 → RAG 추천 결과(3권 + 이유 + 읽는 순서) →
 
 모든 기능을 완성하기보다 **이 데모 흐름이 끊김 없이 작동**하는 것이 우선. 10분 발표 중 파싱 오류·타임아웃으로 데모가 깨지지 않게 하는 것이 핵심 리스크 관리 기준이다.
 
+> **v1.4 핵심 원칙**: 화면에 표시하는 도서와 RAG가 추천하는 도서는 **동일한 데이터 소스**(교보문고 공개 API로 수집해 `Book` 스키마로 정규화한 데이터)를 사용한다. "화면에 보이는 책 ≠ AI가 추천하는 책" 불일치를 만들지 않는다.
+
 ## 기술 스택
 
 | 영역 | 선택 |
 |---|---|
 | Frontend | Next.js 14 (App Router) + TypeScript + Tailwind CSS |
-| API 프록시 | Next.js API Routes (FastAPI URL은 Vercel 환경변수에만 저장, 서버 간 통신) |
+| API 프록시 | Next.js API Routes (FastAPI URL·교보 API 호출은 서버 측에서만 수행, 클라이언트 미노출) |
 | AI 서버 | Python FastAPI (Railway) |
 | AI 파이프라인 | Python LangChain (pip) |
 | LLM (생성) | OpenAI GPT-5.4 Mini — 모델명은 **환경변수로 분리**해 코드 변경 없이 Nano 전환 가능 |
 | 임베딩 | OpenAI text-embedding-3-small |
 | 벡터 검색 | Chroma — **FastAPI 프로세스 내 임베디드** 실행 (별도 서버 없음) |
-| 데이터 | JSON 샘플 도서 40~60권 (전 분야 포괄) |
+| 데이터 | 교보문고 공개 API로 수집한 도서 데이터를 `Book` 스키마로 정규화 (화면 표시·RAG 추천 공용) |
 | 배포 | Vercel(Next.js) + Railway(FastAPI+Chroma) |
 
 ### 아키텍처
 
 ```
 브라우저 → Next.js(Vercel, UI + API Route 프록시) → FastAPI(Railway)
+   └ 교보 API 수집 데이터 → Book 정규화 → (화면 표시 + Chroma 임베딩) 동일 소스
    └ LangChain RAG: 입력 임베딩 → Chroma 검색(임베디드) → GPT-5.4 Mini 생성(JSON 스키마 강제)
    └ POST /recommend → AiRecommendationResult JSON / GET /health
                                       → OpenAI API(외부)
@@ -89,6 +92,8 @@ export type AiRecommendationResult = {
 
 `studyBookType`이 없으면 일반 도서 → "개념서→문제집→기출문제집" 학습 순서를 강제하지 않는다.
 
+교보 API 응답은 위 `Book` 스키마로 정규화해서 사용한다. 스키마 자체(필드 구성)는 v1.3과 동일하며, 임의로 필드를 추가/변경하지 않는다.
+
 ### RAG 문서 형태 (Chroma 적재용 텍스트)
 
 ```
@@ -137,7 +142,7 @@ export type AiRecommendationResult = {
 
 ## 구현 순서
 
-1. 라우팅 구성 → 2. 샘플 도서 JSON 생성 → 3. Home → 4. 도서 목록/필터 → 5. 도서 상세 → 6. AI 상담 입력 UI → 7. 추천 결과 UI → 8. Next.js API Route ↔ FastAPI 연결 → 9. LangChain+Chroma RAG → 10. Fallback → 11. 배포
+1. 라우팅 구성 → 2. 교보 API 도서 수집·`Book` 정규화 → 3. Home → 4. 도서 목록/필터 → 5. 도서 상세 → 6. AI 상담 입력 UI → 7. 추천 결과 UI → 8. Next.js API Route ↔ FastAPI 연결 → 9. LangChain+Chroma RAG → 10. Fallback → 11. 배포
 
 우선순위: F-01~F-06, F-10이 **P0**. F-07~F-09는 P1.
 
@@ -152,8 +157,8 @@ export type AiRecommendationResult = {
 ## Non-Goals / 하지 말 것
 
 - 실제 결제·로그인/회원가입/마이페이지 구현 금지
-- 실제 교보문고 API 연동·실시간 재고 조회 금지
-- **실제 도서 크롤링 금지** (저작권 — 샘플 JSON만 사용)
+- 실시간 재고 조회·재고/가격의 실시간 정합성 보장 금지 (도서 서지정보 수집용 교보 공개 API 호출은 허용, 표시 값은 수집 시점 기준)
+- **도서 본문·표지 원본 재배포 및 무분별한 대량 크롤링 금지** (교보 공개 API에서 서지정보·리뷰 요약 수준만 수집)
 - 바로드림은 "가능 여부 표시 + 구매 흐름 버튼"까지만 (실제 주문 X)
 - 장바구니·리뷰 작성·본문 제공 등 부가 기능 먼저 만들지 않기
 - OpenAI API 키를 프론트엔드에 노출 금지 (FastAPI/Railway 환경변수에서만)

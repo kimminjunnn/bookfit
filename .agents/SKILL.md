@@ -13,6 +13,7 @@ description: >
 
 BookFit의 핵심 기능인 **AI 도서 상담(독서 큐레이터)** 파이프라인을 구현·수정하기 위한 지침이다.
 데모데이 MVP이며, "상담 입력 → 추천 3권 → 도서 상세 이동" 흐름이 발표 중 깨지지 않는 것이 최우선이다.
+(기준 문서: `BookFit_PRD_v1.4.md`)
 
 ## 전체 파이프라인
 
@@ -42,6 +43,7 @@ UserBookConsultInput
 
 입력 `UserBookConsultInput`, 출력 `AiRecommendationResult`, 도서 `Book` 타입은 `CLAUDE.md` / PRD 9장 스키마를 그대로 따른다. 임의로 필드를 추가/변경하지 않는다.
 
+- **도서 데이터는 교보문고 공개 API로 수집해 `Book` 스키마로 정규화한 것을 사용하며, 화면에 표시되는 도서 데이터와 동일한 소스여야 한다(화면↔RAG 불일치 금지).**
 - `Book.studyBookType`은 `category`가 `"자격증/수험서"` 또는 `"전공서"`일 때만 존재.
 - `studyBookType`이 없는 일반 도서는 `readingFlow`에 "개념서→문제집→기출문제집" 같은 학습 순서를 강제하지 않는다("순서 무관" 또는 추천 읽기 순서).
 - `freeText` 하나만으로도 상담이 되어야 한다(F-02).
@@ -94,7 +96,7 @@ UserBookConsultInput
 
 - `POST /recommend` — body: `UserBookConsultInput`, response: `AiRecommendationResult`.
 - `GET /health` — 발표 전 상태 확인 및 Railway 콜드스타트 방지 웜업용.
-- OpenAI API 키는 **Railway 환경변수에서만** 읽는다. 클라이언트는 Next.js API Route를 거쳐서만 호출(FastAPI URL은 Vercel 환경변수).
+- OpenAI API 키는 **Railway 환경변수에서만** 읽는다. 클라이언트는 Next.js API Route를 거쳐서만 호출(FastAPI URL은 Vercel 환경변수). 교보 API 호출도 서버 측에서만 수행한다.
 - LLM 모델명은 환경변수(`OPENAI_MODEL` 등)로 분리 — 코드 변경 없이 Mini↔Nano 전환.
 
 ## Fallback (구현 시 함께 처리)
@@ -112,6 +114,7 @@ UserBookConsultInput
 ## 구현 체크리스트
 
 - [ ] 입력 텍스트 구성 함수: `UserBookConsultInput` → 검색 쿼리 문자열
+- [ ] 교보 API 수집 데이터 → `Book` 정규화 (화면·RAG 동일 소스)
 - [ ] Chroma 컬렉션 사전 적재(서버 기동 시 1회) + 메타데이터 저장
 - [ ] Top-K 검색 → RAG 문서 컨텍스트 조립
 - [ ] LangChain + GPT-5.4 Mini, JSON 스키마 강제 출력
@@ -123,5 +126,6 @@ UserBookConsultInput
 ## 하지 말 것
 
 - 검색 결과에 없는 책 창작 추천, JSON 스키마 벗어난 자유 텍스트 반환.
-- 실제 도서 크롤링, 실제 결제/주문, API 키 프론트 노출.
+- 화면 표시 데이터와 RAG 추천 데이터를 서로 다른 소스로 분리(불일치 유발).
+- 도서 본문·표지 원본 재배포 및 무분별한 대량 크롤링(교보 공개 API 서지정보 수집은 허용), 실제 결제/주문, API 키 프론트 노출.
 - 런타임 전량 재임베딩, 별도 Chroma 서버 구성(임베디드로 통합).
