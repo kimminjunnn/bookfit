@@ -9,7 +9,7 @@ import ErrorState from "./ErrorState";
 import { UserBookConsultInput, AiRecommendationResult } from "@/types/book";
 
 export default function AiConsultModal() {
-  const { isModalOpen, prefillText, closeModal } = useAiConsult();
+  const { isModalOpen, prefillText, autoSubmit, closeModal } = useAiConsult();
   const [status, setStatus] = useState<"idle" | "loading" | "result" | "error">("idle");
   const [result, setResult] = useState<AiRecommendationResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -53,6 +53,16 @@ export default function AiConsultModal() {
       setStatus("error");
     }
   };
+
+  // Handle autoSubmit from context
+  useEffect(() => {
+    if (isModalOpen && autoSubmit && prefillText.trim() && status === "idle") {
+      handleFormSubmit({
+        situation: prefillText.trim(),
+        freeText: prefillText.trim(),
+      });
+    }
+  }, [isModalOpen, autoSubmit, prefillText, status]);
 
   const handleRetry = () => {
     if (lastInput) {

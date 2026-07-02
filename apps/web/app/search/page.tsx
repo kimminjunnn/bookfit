@@ -8,53 +8,6 @@ import AiCuratorNudge from "@/components/AiCuratorNudge";
 import { Book } from "@/types/book";
 import { looksLikeConsultQuery, SearchResponse } from "@/src/features/search/searchBooks";
 
-function SearchBar({
-  defaultValue,
-  onSearch,
-}: {
-  defaultValue: string;
-  onSearch: (q: string) => void;
-}) {
-  const [localQ, setLocalQ] = useState(defaultValue);
-
-  useEffect(() => {
-    setLocalQ(defaultValue);
-  }, [defaultValue]);
-
-  return (
-    <div className="flex flex-col gap-xs">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (localQ.trim()) onSearch(localQ.trim());
-        }}
-        className="relative"
-      >
-        <input
-          id="search-input"
-          type="text"
-          value={localQ}
-          onChange={(e) => setLocalQ(e.target.value)}
-          placeholder="제목, 저자, 출판사 검색"
-          className="w-full h-14 px-md pl-12 pr-[120px] rounded-xl border border-outline-variant bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all text-[16px] shadow-sm"
-          autoComplete="off"
-        />
-        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px]">
-          search
-        </span>
-        <button
-          type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-md h-10 bg-primary text-white rounded-lg font-semibold text-[14px] hover:opacity-90 transition-all cursor-pointer"
-        >
-          검색
-        </button>
-      </form>
-
-      {/* 보조 링크 형태의 AI 큐레이터 유도 (link) */}
-      <AiCuratorNudge variant="link" query={localQ} />
-    </div>
-  );
-}
 
 function SearchResults() {
   const searchParams = useSearchParams();
@@ -111,22 +64,12 @@ function SearchResults() {
         <h1 className="text-[28px] font-bold text-on-surface leading-tight tracking-[-0.02em]">
           {q ? (
             <>
-              &ldquo;<span className="text-primary">{q}</span>&rdquo; 검색 결과
+              &ldquo;<span className="text-primary">{q}</span>&rdquo; 검색
             </>
           ) : (
             "도서 검색"
           )}
         </h1>
-        {!loading && q && (
-          <p className="text-[14px] text-on-surface-variant mt-xs">
-            총 <strong>{total}</strong>권의 도서를 찾았습니다.
-          </p>
-        )}
-      </div>
-
-      {/* 검색바 */}
-      <div className="mb-lg">
-        <SearchBar defaultValue={q} onSearch={handleSearch} />
       </div>
 
       {/* 상황형 쿼리 감지 배너 (banner) */}
@@ -177,8 +120,13 @@ function SearchResults() {
 
       {/* 검색 결과 리스트 */}
       {!loading && !error && books.length > 0 && (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-lg">
+        <section className="mt-section">
+          <div className="flex justify-between items-end mb-lg">
+            <h2 className="text-[20px] font-bold leading-[1.3] tracking-[-0.02em] text-on-surface">
+              도서 검색 결과 <span className="text-primary font-extrabold text-[16px] ml-1">({total}권)</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-lg animate-fade-in">
             {books.map((book, i) => (
               <BookCard
                 key={book.id}
@@ -193,7 +141,7 @@ function SearchResults() {
           <div className="animate-fade-in">
             <AiCuratorNudge variant="footer" query={q} />
           </div>
-        </>
+        </section>
       )}
     </div>
   );
