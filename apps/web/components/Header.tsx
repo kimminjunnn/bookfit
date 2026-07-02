@@ -42,12 +42,6 @@ export default function Header() {
             </div>
           </Link>
           <div className="hidden md:flex items-center gap-lg">
-            <Link href="/" className={getLinkClass("/")}>
-              홈
-            </Link>
-            <Link href="/#category-section" className="text-on-surface-variant text-[15px] font-semibold tracking-[0.02em] hover:text-primary transition-colors pb-1">
-              카테고리
-            </Link>
             <Link href="/bestsellers" className={getLinkClass("/bestsellers")}>
               베스트셀러
             </Link>
