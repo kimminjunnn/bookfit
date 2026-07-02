@@ -12,69 +12,56 @@ export default function RecommendationResult({
   result,
   onReset,
 }: RecommendationResultProps) {
+
+
   return (
-    <div className="space-y-6 pb-6">
-      {/* AI Curator Summary */}
-      <div className="flex gap-xs items-start">
-        <div className="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0 mt-1">
+    <div className="flex flex-col gap-sm animate-fade-in h-full">
+
+      {/* ── Top strip: AI summary + meta ─────────────────────────────── */}
+      <div className="bg-[#f8f9f6] border border-outline-variant rounded-xl p-sm flex flex-col gap-xs shrink-0">
+        {/* Row 1: icon + summary */}
+        <div className="flex gap-xs items-start">
           <span
-            className="material-symbols-outlined text-primary text-sm"
+            className="material-symbols-outlined text-primary text-[15px] shrink-0 mt-0.5"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
             smart_toy
           </span>
-        </div>
-        <div className="bg-surface-container px-md py-sm rounded-xl rounded-tl-none max-w-[85%] border border-outline-variant/30">
-          <p className="font-semibold text-primary text-[13px] mb-1">AI 큐레이터 분석</p>
-          <p className="text-[14px] leading-relaxed text-on-surface">
+          <p className="text-[12px] leading-relaxed text-on-surface font-medium line-clamp-2 flex-1">
             {result.summary}
           </p>
         </div>
-      </div>
 
-      {/* Recommended Category Callout */}
-      <div className="bg-[#EAF1FE] border border-secondary/20 p-md rounded-xl flex items-center justify-between">
-        <div>
-          <p className="text-[12px] font-semibold text-secondary">추천 도서 분야</p>
-          <h4 className="text-[16px] font-bold text-on-surface mt-0.5">
+        {/* Row 2: badges */}
+        <div className="flex items-center flex-wrap gap-xs pt-0.5 border-t border-outline-variant/40">
+          {/* Category badge */}
+          <span className="flex items-center gap-0.5 bg-primary/8 text-primary text-[10.5px] font-bold px-2 py-0.5 rounded-full border border-primary/15">
+            <span className="material-symbols-outlined text-[11px]">menu_book</span>
             {result.neededCategory}
-          </h4>
-        </div>
-        <span className="material-symbols-outlined text-secondary text-[28px]">
-          menu_book
-        </span>
-      </div>
+          </span>
 
-
-
-      {/* Book List */}
-      <div className="space-y-4">
-        <h3 className="text-[15px] font-bold text-on-surface px-1">
-          추천 도서 ({result.recommendedBooks.length}권)
-        </h3>
-        <div className="space-y-3">
-          {result.recommendedBooks.map((recBook, idx) => (
-            <RecommendationBookCard
-              key={recBook.id}
-              recommendedBook={recBook}
-              index={idx}
-            />
-          ))}
+          {/* Reset button — tucked to right */}
+          <button
+            onClick={onReset}
+            className="ml-auto flex items-center gap-0.5 text-[10.5px] font-bold text-on-surface-variant/60 hover:text-on-surface transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[13px]">restart_alt</span>
+            다시 추천
+          </button>
         </div>
       </div>
 
-      {/* Reset button */}
-      <div className="pt-2">
-        <button
-          onClick={onReset}
-          className="w-full h-12 border border-outline-variant bg-surface hover:bg-surface-container rounded-lg font-semibold text-[14px] text-on-surface-variant flex items-center justify-center gap-xs transition-colors"
-        >
-          <span className="material-symbols-outlined text-[18px]">restart_alt</span>
-          다시 추천받기
-        </button>
+      {/* ── Bottom: 3-column book cards (all visible at once) ───────── */}
+      <div className="grid grid-cols-3 gap-sm flex-1 min-h-0">
+        {result.recommendedBooks.map((recBook, idx) => (
+          <RecommendationBookCard
+            key={recBook.id}
+            recommendedBook={recBook}
+            index={idx}
+          />
+        ))}
       </div>
+
     </div>
   );
 }
-
-import React from "react";
