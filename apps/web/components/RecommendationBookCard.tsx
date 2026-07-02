@@ -6,6 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import booksData from "@/data/books.json";
 import { COVER_GRADIENTS } from "@/dummy_data/dummy-books";
+import { useAiConsult } from "./AiConsultContext";
+import { useRouter } from "next/navigation";
 
 interface RecommendationBookCardProps {
   recommendedBook: RecommendedBook;
@@ -16,8 +18,16 @@ export default function RecommendationBookCard({
   recommendedBook,
   index,
 }: RecommendationBookCardProps) {
+  const { closeModal } = useAiConsult();
+  const router = useRouter();
   const [fullBook, setFullBook] = useState<Book | null>(null);
   const [imgError, setImgError] = useState(false);
+
+  const handleDetailClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    closeModal();
+    router.push(`/books/${recommendedBook.id}?reason=${encodeURIComponent(recommendedBook.reason)}`);
+  };
 
   useEffect(() => {
     // Find the full book details from books.json using the recommended ID
@@ -27,12 +37,12 @@ export default function RecommendationBookCard({
     }
   }, [recommendedBook.id]);
 
-  const bookTitle = fullBook?.title || recommendedBook.title;
-  const author = fullBook?.author || recommendedBook.author || "";
-  const price = fullBook?.price || recommendedBook.price;
-  const category = fullBook?.category || recommendedBook.category;
-  const coverImage = fullBook?.coverImage || recommendedBook.coverImage;
-  const pickupAvailable = fullBook ? fullBook.pickupAvailable : recommendedBook.pickupAvailable;
+  const bookTitle = recommendedBook.title || fullBook?.title;
+  const author = recommendedBook.author || recommendedBook.author || fullBook?.author || "";
+  const price = recommendedBook.price || fullBook?.price;
+  const category = recommendedBook.category || fullBook?.category;
+  const coverImage = recommendedBook.coverImage || fullBook?.coverImage;
+  const pickupAvailable = recommendedBook.pickupAvailable !== undefined ? recommendedBook.pickupAvailable : (fullBook ? fullBook.pickupAvailable : false);
 
   const gradientClass = COVER_GRADIENTS[index % COVER_GRADIENTS.length];
 
@@ -90,7 +100,7 @@ export default function RecommendationBookCard({
           <h4 className="font-bold text-[16px] text-on-surface line-clamp-1">
             {bookTitle}
           </h4>
-          
+
           {author && (
             <p className="text-[13px] text-on-surface-variant/80 mt-0.5">
               {author} 저자 {price && `· ${price.toLocaleString("ko-KR")}원`}
@@ -110,6 +120,7 @@ export default function RecommendationBookCard({
         <div className="mt-3 flex justify-end">
           <Link
             href={`/books/${recommendedBook.id}?reason=${encodeURIComponent(recommendedBook.reason)}`}
+            onClick={handleDetailClick}
             className="text-[12px] font-semibold text-secondary hover:text-secondary-container flex items-center gap-0.5 group"
           >
             상세 보기

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAiConsult } from "./AiConsultContext";
 import AiConsultForm from "./AiConsultForm";
 import LoadingState from "./LoadingState";
@@ -14,6 +14,16 @@ export default function AiConsultModal() {
   const [result, setResult] = useState<AiRecommendationResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [lastInput, setLastInput] = useState<UserBookConsultInput | null>(null);
+
+  // Reset modal state when closed to ensure it starts fresh next time
+  useEffect(() => {
+    if (!isModalOpen) {
+      setStatus("idle");
+      setResult(null);
+      setErrorMessage("");
+      setLastInput(null);
+    }
+  }, [isModalOpen]);
 
   if (!isModalOpen) return null;
 
