@@ -106,23 +106,23 @@ export default function AiConsultModal() {
       />
 
       {/* Modal Container */}
-      <div className="fixed bg-white rounded-xl z-50 modal-shadow flex flex-col overflow-hidden modal-panel-enter inset-0 m-auto w-full max-w-[600px] h-[95vh] max-h-[750px] shadow-2xl">
+      <div className="fixed bg-white rounded-2xl z-50 flex flex-col overflow-hidden modal-panel-enter inset-0 m-auto w-full max-w-[600px] h-[95vh] max-h-[780px] shadow-[0_20px_60px_rgba(0,0,0,0.18)] border border-outline-variant/30">
         {/* Header */}
-        <header className="bg-primary px-md h-[60px] flex justify-between items-center shrink-0">
+        <header className="bg-gradient-to-r from-primary to-[#005226] px-md h-[64px] flex justify-between items-center shrink-0 border-b border-white/10 shadow-sm">
           <div className="flex items-center gap-xs text-white">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
+            <span className="material-symbols-outlined text-[20px] animate-pulse text-white/95" style={{ fontVariationSettings: "'FILL' 1" }}>
               auto_awesome
             </span>
-            <span className="font-semibold text-[18px] text-white">
-              BookFit AI 도서 추천
+            <span className="font-semibold text-[17px] tracking-tight text-white">
+              BookFit AI 도서 상담소
             </span>
           </div>
           <button
             onClick={handleClose}
-            className="text-white hover:opacity-80 transition-opacity flex items-center justify-center p-1 cursor-pointer"
+            className="text-white/90 hover:text-white hover:bg-white/10 transition-all rounded-full p-1.5 flex items-center justify-center cursor-pointer"
             aria-label="닫기"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </header>
 

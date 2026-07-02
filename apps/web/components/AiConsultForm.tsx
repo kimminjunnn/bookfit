@@ -11,10 +11,8 @@ export default function AiConsultForm({ onSubmit }: AiConsultFormProps) {
   const [situation, setSituation] = useState("");
   const [preferredCategory, setPreferredCategory] = useState("");
   const [goal, setGoal] = useState("");
-  const [studyPeriod, setStudyPeriod] = useState("1주일");
-  const [pickupStore, setPickupStore] = useState("광화문 본점");
   
-  // Accordion active state: 'category' | 'purpose' | 'duration' | 'store' | null
+  // Accordion active state: 'category' | 'purpose' | null
   const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
 
   const toggleAccordion = (name: string) => {
@@ -32,8 +30,6 @@ export default function AiConsultForm({ onSubmit }: AiConsultFormProps) {
       situation: situation.trim(),
       preferredCategory: preferredCategory || undefined,
       goal: goal || undefined,
-      studyPeriod: studyPeriod || undefined,
-      pickupStore: pickupStore || undefined,
       freeText: situation.trim(),
     });
   };
@@ -49,70 +45,74 @@ export default function AiConsultForm({ onSubmit }: AiConsultFormProps) {
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-md pb-12">
+    <form onSubmit={handleSubmit} className="space-y-md pb-24">
       {/* Welcome message bubble */}
-      <div className="flex gap-xs items-start">
-        <div className="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0 mt-1">
+      <div className="flex gap-sm items-start animate-fade-in">
+        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-[#009e49] flex items-center justify-center shrink-0 shadow-sm border border-primary/20">
           <span
-            className="material-symbols-outlined text-primary text-sm"
+            className="material-symbols-outlined text-white text-[18px]"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
             smart_toy
           </span>
         </div>
-        <div className="bg-surface-container px-md py-sm rounded-xl rounded-tl-none max-w-[85%] border border-outline-variant/30">
-          <p className="text-[14px] text-on-surface">
-            안녕하세요! 어떤 책을 찾으시나요? 당신의 고민이나 관심사를 편하게 들려주세요.
+        <div className="bg-gradient-to-br from-white to-[#f7f9f6] px-md py-sm rounded-2xl rounded-tl-none max-w-[85%] shadow-sm border border-outline-variant/60">
+          <p className="font-semibold text-primary text-[11px] mb-0.5">AI 도서 상담사</p>
+          <p className="text-[14px] leading-relaxed text-on-surface font-medium">
+            안녕하세요! 어떤 책을 찾으시나요? 당신의 고민이나 관심사, 혹은 찾고 계신 도서의 특징을 편하게 들려주세요.
           </p>
         </div>
       </div>
 
       {/* Textarea Input */}
-      <div className="space-y-xs">
-        <textarea
-          value={situation}
-          onChange={(e) => setSituation(e.target.value)}
-          className="w-full h-32 p-md rounded-lg border border-outline-variant bg-white focus:ring-1 focus:ring-secondary focus:border-secondary resize-none text-[15px] leading-relaxed text-on-surface placeholder:text-on-surface-variant/40 outline-none transition-all"
-          placeholder="예: 요즘 번아웃이 와서 마음을 다잡을 책이 필요해요. 가벼운 수필이나 인문 서적이면 좋겠어요."
-        />
-        <p className="text-[12px] text-on-surface-variant/60 px-1">
-          더 상세히 적어주실수록 정확한 추천이 가능합니다.
+      <div className="space-y-xs animate-fade-in" style={{ animationDelay: "100ms" }}>
+        <div className="relative group">
+          <textarea
+            value={situation}
+            onChange={(e) => setSituation(e.target.value)}
+            className="w-full h-36 p-md rounded-xl border border-outline-variant bg-white focus:ring-2 focus:ring-primary/10 focus:border-primary resize-none text-[14.5px] leading-relaxed text-on-surface placeholder:text-on-surface-variant/40 outline-none shadow-inner transition-all hover:border-outline-variant/80"
+            placeholder="예: 요즘 번아웃이 와서 마음을 다잡을 책이 필요해요. 가벼운 수필이나 인문 서적이면 좋겠어요."
+          />
+        </div>
+        <p className="text-[11.5px] text-on-surface-variant/60 px-1 flex items-center gap-1 font-medium">
+          <span className="material-symbols-outlined text-[14px]">info</span>
+          상세히 적어주실수록 당신에게 딱 맞춘 정확한 추천이 가능합니다.
         </p>
       </div>
 
       {/* Collapsible Input Sections */}
-      <div className="space-y-xs">
+      <div className="space-y-sm animate-fade-in" style={{ animationDelay: "200ms" }}>
         
         {/* Category Accordion */}
-        <div className="border border-outline-variant rounded-lg overflow-hidden transition-all bg-white shadow-sm">
+        <div className="border border-outline-variant/80 rounded-xl overflow-hidden transition-all bg-white shadow-sm hover:shadow-md hover:border-primary/20">
           <button
             type="button"
-            className="w-full flex justify-between items-center p-md bg-surface-container-low hover:bg-surface-container/50 transition-colors text-left"
+            className="w-full flex justify-between items-center p-md bg-[#fafbfa] hover:bg-surface transition-colors text-left cursor-pointer"
             onClick={() => toggleAccordion("category")}
           >
             <div className="flex items-center gap-xs">
-              <span className="material-symbols-outlined text-[20px] text-on-surface-variant">category</span>
-              <span className="text-[14px] font-semibold text-on-surface">
-                선호 분야 {preferredCategory && `(${preferredCategory})`}
+              <span className={`material-symbols-outlined text-[20px] ${preferredCategory ? 'text-primary' : 'text-on-surface-variant/70'}`}>category</span>
+              <span className="text-[14px] font-bold text-on-surface">
+                선호 분야 {preferredCategory && <span className="text-primary font-extrabold ml-1">({preferredCategory})</span>}
               </span>
             </div>
-            <span className={`material-symbols-outlined text-on-surface-variant text-[20px] transition-transform duration-200 ${activeAccordion === "category" ? "rotate-180" : ""}`}>
+            <span className={`material-symbols-outlined text-on-surface-variant/60 text-[20px] transition-transform duration-250 ${activeAccordion === "category" ? "rotate-180" : ""}`}>
               expand_more
             </span>
           </button>
           
           {activeAccordion === "category" && (
-            <div className="p-md border-t border-outline-variant bg-white space-y-xs animate-in fade-in duration-200">
+            <div className="p-md border-t border-outline-variant bg-white space-y-xs animate-fade-in">
               <div className="flex flex-wrap gap-xs">
                 {categories.map((cat) => (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => setPreferredCategory(preferredCategory === cat ? "" : cat)}
-                    className={`px-3 py-1.5 rounded-full text-[13px] border border-outline-variant transition-all hover:border-secondary cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-full text-[13px] border transition-all cursor-pointer hover:-translate-y-0.5 active:translate-y-0 ${
                       preferredCategory === cat
-                        ? "bg-primary text-white border-primary"
-                        : "bg-surface text-on-surface-variant"
+                        ? "bg-primary text-white border-primary shadow-sm shadow-primary/30 font-semibold"
+                        : "bg-[#f8f9f6] text-on-surface-variant/90 border-outline-variant hover:border-primary/40 hover:bg-white"
                     }`}
                   >
                     {cat}
@@ -124,35 +124,35 @@ export default function AiConsultForm({ onSubmit }: AiConsultFormProps) {
         </div>
 
         {/* Goal Accordion */}
-        <div className="border border-outline-variant rounded-lg overflow-hidden transition-all bg-white shadow-sm">
+        <div className="border border-outline-variant/80 rounded-xl overflow-hidden transition-all bg-white shadow-sm hover:shadow-md hover:border-primary/20">
           <button
             type="button"
-            className="w-full flex justify-between items-center p-md bg-surface-container-low hover:bg-surface-container/50 transition-colors text-left"
+            className="w-full flex justify-between items-center p-md bg-[#fafbfa] hover:bg-surface transition-colors text-left cursor-pointer"
             onClick={() => toggleAccordion("purpose")}
           >
             <div className="flex items-center gap-xs">
-              <span className="material-symbols-outlined text-[20px] text-on-surface-variant">track_changes</span>
-              <span className="text-[14px] font-semibold text-on-surface">
-                독서 목적 {goal && `(${goal})`}
+              <span className={`material-symbols-outlined text-[20px] ${goal ? 'text-primary' : 'text-on-surface-variant/70'}`}>track_changes</span>
+              <span className="text-[14px] font-bold text-on-surface">
+                독서 목적 {goal && <span className="text-primary font-extrabold ml-1">({goal})</span>}
               </span>
             </div>
-            <span className={`material-symbols-outlined text-on-surface-variant text-[20px] transition-transform duration-200 ${activeAccordion === "purpose" ? "rotate-180" : ""}`}>
+            <span className={`material-symbols-outlined text-on-surface-variant/60 text-[20px] transition-transform duration-250 ${activeAccordion === "purpose" ? "rotate-180" : ""}`}>
               expand_more
             </span>
           </button>
 
           {activeAccordion === "purpose" && (
-            <div className="p-md border-t border-outline-variant bg-white animate-in fade-in duration-200">
+            <div className="p-md border-t border-outline-variant bg-white animate-fade-in">
               <div className="grid grid-cols-3 gap-xs">
                 {goals.map((g) => (
                   <button
                     key={g}
                     type="button"
                     onClick={() => setGoal(goal === g ? "" : g)}
-                    className={`p-2 text-[13px] border rounded transition-all text-center hover:bg-surface-container/30 ${
+                    className={`p-2.5 rounded-lg text-[13px] border transition-all text-center hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${
                       goal === g
-                        ? "border-primary bg-primary/5 font-semibold text-primary"
-                        : "border-outline-variant text-on-surface-variant"
+                        ? "border-primary bg-primary/5 font-bold text-primary shadow-sm shadow-primary/10"
+                        : "border-outline-variant text-on-surface-variant/90 bg-[#f8f9f6] hover:border-primary/40 hover:bg-white"
                     }`}
                   >
                     {g}
@@ -163,89 +163,15 @@ export default function AiConsultForm({ onSubmit }: AiConsultFormProps) {
           )}
         </div>
 
-        {/* Duration Accordion */}
-        <div className="border border-outline-variant rounded-lg overflow-hidden transition-all bg-white shadow-sm">
-          <button
-            type="button"
-            className="w-full flex justify-between items-center p-md bg-surface-container-low hover:bg-surface-container/50 transition-colors text-left"
-            onClick={() => toggleAccordion("duration")}
-          >
-            <div className="flex items-center gap-xs">
-              <span className="material-symbols-outlined text-[20px] text-on-surface-variant">calendar_today</span>
-              <span className="text-[14px] font-semibold text-on-surface">
-                학습/독서 기간 ({studyPeriod})
-              </span>
-            </div>
-            <span className={`material-symbols-outlined text-on-surface-variant text-[20px] transition-transform duration-200 ${activeAccordion === "duration" ? "rotate-180" : ""}`}>
-              expand_more
-            </span>
-          </button>
-
-          {activeAccordion === "duration" && (
-            <div className="p-md border-t border-outline-variant bg-white space-y-sm animate-in fade-in duration-200">
-              <div className="flex justify-between gap-xs">
-                {["1주일", "2주일", "1개월", "1개월 이상"].map((period) => (
-                  <button
-                    key={period}
-                    type="button"
-                    onClick={() => setStudyPeriod(period)}
-                    className={`flex-1 py-2 text-[13px] border rounded text-center transition-all ${
-                      studyPeriod === period
-                        ? "border-primary bg-primary/5 font-semibold text-primary"
-                        : "border-outline-variant text-on-surface-variant bg-surface"
-                    }`}
-                  >
-                    {period}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Store Accordion */}
-        <div className="border border-outline-variant rounded-lg overflow-hidden transition-all bg-white shadow-sm">
-          <button
-            type="button"
-            className="w-full flex justify-between items-center p-md bg-surface-container-low hover:bg-surface-container/50 transition-colors text-left"
-            onClick={() => toggleAccordion("store")}
-          >
-            <div className="flex items-center gap-xs">
-              <span className="material-symbols-outlined text-[20px] text-on-surface-variant">storefront</span>
-              <span className="text-[14px] font-semibold text-on-surface">
-                바로드림 매장 ({pickupStore})
-              </span>
-            </div>
-            <span className={`material-symbols-outlined text-on-surface-variant text-[20px] transition-transform duration-200 ${activeAccordion === "store" ? "rotate-180" : ""}`}>
-              expand_more
-            </span>
-          </button>
-
-          {activeAccordion === "store" && (
-            <div className="p-md border-t border-outline-variant bg-white animate-in fade-in duration-200">
-              <select
-                value={pickupStore}
-                onChange={(e) => setPickupStore(e.target.value)}
-                className="w-full p-2.5 text-[14px] border border-outline-variant rounded bg-white outline-none focus:border-primary"
-              >
-                <option value="광화문 본점">광화문 본점</option>
-                <option value="강남점">강남점</option>
-                <option value="영등포점">영등포점</option>
-                <option value="온라인 전용">온라인 전용</option>
-              </select>
-            </div>
-          )}
-        </div>
-
       </div>
 
       {/* Footer Submit Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-md bg-white border-t border-outline-variant z-10 max-w-[600px] mx-auto rounded-b-xl">
+      <div className="fixed bottom-0 left-0 right-0 p-md bg-white border-t border-outline-variant/60 z-10 max-w-[600px] mx-auto rounded-b-2xl shadow-[0_-5px_15px_rgba(0,0,0,0.03)]">
         <button
           type="submit"
-          className="w-full h-12 bg-primary text-white rounded-lg font-semibold text-[15px] flex items-center justify-center gap-xs hover:opacity-90 active:scale-[0.98] transition-all shadow-md cursor-pointer"
+          className="w-full h-12 bg-gradient-to-r from-primary to-[#00863f] text-white rounded-xl font-bold text-[15px] flex items-center justify-center gap-xs hover:from-[#007a39] hover:to-[#009b49] hover:shadow-[0_4px_20px_rgba(0,107,50,0.25)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 shadow-md cursor-pointer"
         >
-          <span className="material-symbols-outlined">auto_awesome</span>
+          <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
           책 추천받기
         </button>
       </div>
