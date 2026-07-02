@@ -104,3 +104,56 @@ def recommend_books(request: ConsultRequest):
         )
         
     return response
+
+@app.get("/books/{book_id}", status_code=status.HTTP_200_OK)
+def get_book_detail(book_id: str):
+    """
+    Chroma DB로부터 특정 도서 ID에 매칭되는 상세 서지정보 메타데이터를 찾아 반환합니다.
+    """
+    try:
+        vector_store = get_vector_store()
+        collection = vector_store._collection
+        
+        # ids 매칭 조회
+        res = collection.get(ids=[book_id])
+        
+        if not res or not res.get("metadatas") or len(res["metadatas"]) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"ID가 '{book_id}'인 도서를 데이터베이스에서 찾을 수 없습니다."
+            )
+            
+        meta = res["metadatas"][0]
+        
+        # JSON 문자열인 toc 복원
+        import json
+        toc_str = meta.get("toc", "[]")
+        try:
+            toc = json.loads(toc_str)
+        except Exception:
+            toc = []
+            
+        # UI에 정규화된 스키마대로 반환
+        return {
+            "id": meta.get("id"),
+            "title": meta.get("title", "제목 없음"),
+            "author": meta.get("author", "저자 미상"),
+            "category": meta.get("category", "기타"),
+            "studyBookType": meta.get("studyBookType") if meta.get("studyBookType") else None,
+            "subject": meta.get("subject") if meta.get("subject") else None,
+            "level": meta.get("level", "입문"),
+            "price": int(meta.get("price", 0)),
+            "description": meta.get("description", "책 소개 정보가 없습니다."),
+            "toc": toc,
+            "reviewSummary": meta.get("reviewSummary", "리뷰 정보가 없습니다."),
+            "targetReader": meta.get("targetReader", "전체 대상"),
+            "pickupAvailable": bool(meta.get("pickupAvailable", True)),
+            "coverImage": meta.get("coverImage", "")
+        }
+    except HTTPException as http_ex:
+        raise http_ex
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"도서 상세 조회 중 에러 발생: {str(e)}"
+        )

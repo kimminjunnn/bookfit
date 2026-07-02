@@ -234,11 +234,18 @@ def background_fetch_and_update():
                     metadata={
                         "id": book_id,
                         "title": book.get("title"),
+                        "author": book.get("author", "저자 미상"),
                         "category": book.get("category"),
-                        "pickupAvailable": book.get("pickupAvailable"),
-                        "coverImage": book.get("coverImage"),
-                        "author": book.get("author"),
-                        "price": book.get("price")
+                        "studyBookType": book.get("studyBookType") or "",
+                        "subject": book.get("subject") or "",
+                        "level": book.get("level", "입문"),
+                        "price": book.get("price", 0),
+                        "description": book.get("description", ""),
+                        "toc": json.dumps(book.get("toc", [])),
+                        "reviewSummary": book.get("reviewSummary", ""),
+                        "targetReader": book.get("targetReader", ""),
+                        "pickupAvailable": book.get("pickupAvailable", True),
+                        "coverImage": book.get("coverImage", "")
                     }
                 )
                 documents.append(doc)
@@ -322,11 +329,18 @@ def get_vector_store() -> Chroma:
             metadata={
                 "id": book.get("id"),
                 "title": book.get("title"),
+                "author": book.get("author", "저자 미상"),
                 "category": book.get("category"),
-                "pickupAvailable": book.get("pickupAvailable"),
-                "coverImage": book.get("coverImage"),
-                "author": book.get("author"),
-                "price": book.get("price")
+                "studyBookType": book.get("studyBookType") or "",
+                "subject": book.get("subject") or "",
+                "level": book.get("level", "입문"),
+                "price": book.get("price", 0),
+                "description": book.get("description", ""),
+                "toc": json.dumps(book.get("toc", [])),
+                "reviewSummary": book.get("reviewSummary", ""),
+                "targetReader": book.get("targetReader", ""),
+                "pickupAvailable": book.get("pickupAvailable", True),
+                "coverImage": book.get("coverImage", "")
             }
         )
         documents.append(doc)

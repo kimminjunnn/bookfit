@@ -14,10 +14,10 @@ class RecommendedBookSchema(BaseModel):
     reason: str = Field(description="사용자의 상황을 분석하여 이 책을 추천하는 2~3문장의 구체적인 이유")
     order: int = Field(description="읽는 순서 (수험서는 1, 2, 3 순서 지정, 일반 도서는 순서가 중요하지 않으면 1로 고정)")
     pickupAvailable: bool = Field(description="제공된 데이터의 pickupAvailable 필드 값 그대로 사용 (가능 여부)")
-    coverImage: Optional[str] = Field(None, description="제공된 데이터의 coverImage 필드 값 그대로 사용")
-    author: Optional[str] = Field(None, description="제공된 데이터의 author 필드 값 그대로 사용")
-    price: Optional[int] = Field(None, description="제공된 데이터의 price 필드 값 그대로 사용")
-    category: Optional[str] = Field(None, description="제공된 데이터의 category 필드 값 그대로 사용")
+    coverImage: Optional[str] = Field(default=None, description="도서의 coverImage URL")
+    author: Optional[str] = Field(default=None, description="저자 정보")
+    price: Optional[int] = Field(default=None, description="가격")
+    category: Optional[str] = Field(default=None, description="도서 카테고리")
 
 class AiRecommendationResultSchema(BaseModel):
     summary: str = Field(description="사용자의 현재 고민/상황을 깊이 공감하고 추천 방향성을 설명하는 요약문 (3~4문장)")
@@ -64,7 +64,6 @@ def get_ai_recommendation(
     docs = []
     if preferred_category and preferred_category != "전체":
         # 카테고리 매칭 필터 적용 (Chroma 메타데이터 필터 사용)
-        # category는 한글 카테고리 명이므로 대소문자나 정확한 매칭 필요
         try:
             docs = vector_store.similarity_search(search_query, k=5, filter={"category": preferred_category})
         except Exception as e:
@@ -90,18 +89,14 @@ def get_ai_recommendation(
         pickup = d.metadata.get("pickupAvailable")
         category = d.metadata.get("category")
         
-        cover_image = d.metadata.get("coverImage")
-        author = d.metadata.get("author")
-        price = d.metadata.get("price")
-        
         rag_books_map[book_id] = {
             "id": book_id,
             "title": title,
             "pickupAvailable": pickup,
             "category": category,
-            "coverImage": cover_image,
-            "author": author,
-            "price": price,
+            "coverImage": d.metadata.get("coverImage") or "",
+            "author": d.metadata.get("author") or "저자 미상",
+            "price": int(d.metadata.get("price") or 0),
             "content": d.page_content
         }
         
@@ -136,11 +131,10 @@ def get_ai_recommendation(
     # 4. Structured Output을 사용하는 ChatOpenAI 설정
     llm = ChatOpenAI(
         model=config.LLM_MODEL,
-        temperature=0.1,  # 일관된 추천과 엄격한 형식 준수를 위해 낮은 temperature 설정
+        temperature=0.1,
         openai_api_key=config.OPENAI_API_KEY
     )
     
-    # Pydantic 모델을 활용하여 JSON 스키마 구조 강제
     structured_llm = llm.with_structured_output(AiRecommendationResultSchema)
     
     prompt = ChatPromptTemplate.from_messages([
@@ -157,7 +151,6 @@ def get_ai_recommendation(
         result_dict = response_model.model_dump()
     except Exception as e:
         print(f"[RAG] LLM 호출 중 에러 발생: {e}")
-        # 오류 발생 시 빈 결과를 돌려주어 백엔드 상위 단에서 fallback 할 수 있게 함
         return {
             "error": "LLM_INFERENCE_FAILED",
             "message": str(e)
@@ -166,34 +159,27 @@ def get_ai_recommendation(
     # =====================================================================
     # 5. 사후 검증 (Post-Validation) - 할루시네이션 방지 규칙 적용
     # =====================================================================
-    
-    # 만약 도서 추천과 무관한 질문으로 판단해 추천 도서 목록이 비어있다면, 검증 패스하고 바로 반환
     if not result_dict.get("recommendedBooks"):
         return result_dict
 
     validated_books = []
-    # RAG 검색 결과로 나온 도서의 ID 목록
     valid_ids = list(rag_books_map.keys())
 
     for idx, r_book in enumerate(result_dict["recommendedBooks"]):
         r_id = r_book["id"]
         
-        # LLM이 추천한 ID가 실제 RAG 검색 결과에 존재하는지 대조
         if r_id in rag_books_map:
-            # 존재한다면, 데이터 정합성 유지 (DB의 값들 강제 덮어쓰기)
             actual_info = rag_books_map[r_id]
             r_book["title"] = actual_info["title"]
             r_book["pickupAvailable"] = actual_info["pickupAvailable"]
-            r_book["coverImage"] = actual_info.get("coverImage")
-            r_book["author"] = actual_info.get("author")
-            r_book["price"] = actual_info.get("price")
-            r_book["category"] = actual_info.get("category")
+            r_book["coverImage"] = actual_info["coverImage"]
+            r_book["author"] = actual_info["author"]
+            r_book["price"] = actual_info["price"]
+            r_book["category"] = actual_info["category"]
             validated_books.append(r_book)
         else:
-            # 할루시네이션 발생: 존재하지 않는 도서 ID를 뱉었을 경우
             print(f"[RAG-Validation] 경고: RAG 컨텍스트에 없는 ID '{r_id}'가 추천에 포함되었습니다. 교체를 진행합니다.")
             
-            # RAG 검색 결과 중 아직 추천 리스트에 안 들어간 대체 가능한 책을 검색
             backup_id = None
             used_ids = {b["id"] for b in validated_books}
             for b_id in valid_ids:
@@ -201,7 +187,6 @@ def get_ai_recommendation(
                     backup_id = b_id
                     break
             
-            # 만약 대체할 책을 찾았다면 대체해 삽입
             if backup_id:
                 backup_info = rag_books_map[backup_id]
                 new_reason = f"고민하신 '{situation[:15]}...' 상황에 맞추어, 유사한 깊이의 인사이트를 담은 '{backup_info['title']}' 도서를 추천해 드립니다."
@@ -211,14 +196,13 @@ def get_ai_recommendation(
                     "reason": new_reason,
                     "order": idx + 1,
                     "pickupAvailable": backup_info["pickupAvailable"],
-                    "coverImage": backup_info.get("coverImage"),
-                    "author": backup_info.get("author"),
-                    "price": backup_info.get("price"),
-                    "category": backup_info.get("category")
+                    "coverImage": backup_info["coverImage"],
+                    "author": backup_info["author"],
+                    "price": backup_info["price"],
+                    "category": backup_info["category"]
                 })
                 print(f"[RAG-Validation] '{r_id}'를 실제 도서 '{backup_id}'로 성공적으로 대체하였습니다.")
 
-    # 추천 리스트 개수가 부족하거나 넘치면 정확히 3개로 맞추기 위해 강제 보정
     if len(validated_books) < 3:
         print(f"[RAG-Validation] 경고: 유효한 추천 도서 개수가 부족합니다 ({len(validated_books)}권). RAG 도서 데이터로 채웁니다.")
         used_ids = {b["id"] for b in validated_books}
@@ -233,18 +217,15 @@ def get_ai_recommendation(
                     "reason": f"고민하신 상황에 도움이 될 만한 {info['category']} 분야의 우수 도서입니다.",
                     "order": len(validated_books) + 1,
                     "pickupAvailable": info["pickupAvailable"],
-                    "coverImage": info.get("coverImage"),
-                    "author": info.get("author"),
-                    "price": info.get("price"),
-                    "category": info.get("category")
+                    "coverImage": info["coverImage"],
+                    "author": info["author"],
+                    "price": info["price"],
+                    "category": info["category"]
                 })
 
-    # 최종 검증된 도서 리스트를 3개로 자르거나 대입
     result_dict["recommendedBooks"] = validated_books[:3]
     
-    # order 번호가 1, 2, 3으로 정돈되어 있는지 최종 확인
     for i, book in enumerate(result_dict["recommendedBooks"]):
-        # 수험서가 아닌 일반 도서이고 readingFlow가 '순서 무관'일 경우 order를 1로 지정하라는 조건 검사
         if result_dict.get("readingFlow") == "순서 무관":
             book["order"] = 1
         else:

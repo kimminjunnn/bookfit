@@ -115,6 +115,18 @@ function BookDetailContent({ id }: { id: string }) {
         found = fetchedLive.find((b) => b.id === id);
       }
 
+      // 4. FastAPI 백엔드 단건 상세조회 프록시 API 호출 (신규 적재 도서 대응)
+      if (!found) {
+        try {
+          const res = await fetch(`/api/books/${id}`);
+          if (res.ok) {
+            found = await res.json();
+          }
+        } catch (err) {
+          console.error("Failed to load book from FastAPI Chroma DB:", err);
+        }
+      }
+
       if (found) {
         setBook(found);
       }
