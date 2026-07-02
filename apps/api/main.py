@@ -114,8 +114,8 @@ def get_book_detail(book_id: str):
         vector_store = get_vector_store()
         collection = vector_store._collection
         
-        # ids 매칭 조회
-        res = collection.get(ids=[book_id])
+        # metadata의 id 필드 매칭 조회 (Chroma where 필터 활용)
+        res = collection.get(where={"id": book_id})
         
         if not res or not res.get("metadatas") or len(res["metadatas"]) == 0:
             raise HTTPException(

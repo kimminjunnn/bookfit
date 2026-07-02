@@ -15,6 +15,7 @@ CHROMA_DB_DIR = os.getenv("CHROMA_DB_DIR", str(BASE_DIR / "chroma_db"))
 # books.json 기본 경로 (프로젝트 루트/data/bookdata/books.json)
 PROJECT_ROOT = BASE_DIR.parent.parent
 DEFAULT_BOOKS_JSON = PROJECT_ROOT / "data" / "bookdata" / "books.json"
+LOCAL_FALLBACK_JSON = BASE_DIR / "data" / "books.json"
 
 BOOKS_JSON_PATH = os.getenv("BOOKS_JSON_PATH")
 if BOOKS_JSON_PATH:
@@ -23,4 +24,7 @@ if BOOKS_JSON_PATH:
         # 설정된 상대 경로가 있으면 apps/api 기준 절대 경로로 변환
         BOOKS_JSON_PATH = str((BASE_DIR / path_obj).resolve())
 else:
-    BOOKS_JSON_PATH = str(DEFAULT_BOOKS_JSON.resolve())
+    if DEFAULT_BOOKS_JSON.exists():
+        BOOKS_JSON_PATH = str(DEFAULT_BOOKS_JSON.resolve())
+    else:
+        BOOKS_JSON_PATH = str(LOCAL_FALLBACK_JSON.resolve())
