@@ -25,7 +25,7 @@ export default function RecommendationResult({
             className="material-symbols-outlined text-primary text-[15px] shrink-0 mt-0.5"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
-            smart_toy
+            psychology
           </span>
           <p className="text-[12px] leading-relaxed text-on-surface font-medium line-clamp-2 flex-1">
             {result.summary}
