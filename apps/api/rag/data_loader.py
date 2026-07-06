@@ -197,24 +197,14 @@ def fetch_kyobo_new_releases() -> list[dict]:
 # Chroma Vector Store 싱글톤 인스턴스 홀더
 _vector_store = None
 
-def background_fetch_and_update():
-    """백그라운드 스레드에서 베스트셀러 2, 3페이지를 마저 수집하고 Chroma DB에 중복 없이 추가 인덱싱합니다."""
+def background_fetch_and_update(full_bestsellers: list[dict], full_new_releases: list[dict]):
+    """백그라운드 스레드에서 초기 동기 적재에 빠진 나머지 1페이지 도서들과 베스트셀러 2, 3페이지를 추가 수집하여 Chroma DB에 점진적으로 인덱싱합니다."""
     try:
-        print("[RAG-Background] 백그라운드에서 베스트셀러 2, 3페이지 추가 수집을 시작합니다...")
-        
-        # 2, 3페이지 수집 시도 (15초 넉넉하게 타임아웃 지정)
-        extra_books = fetch_kyobo_bestsellers(pages=[2, 3], timeout=15.0)
-        
-        if not extra_books:
-            print("[RAG-Background] 백그라운드로 가져온 추가 도서 데이터가 없습니다.")
-            return
-
         global _vector_store
         if _vector_store is None:
             print("[RAG-Background] 벡터 스토어가 아직 초기화되지 않아 취소합니다.")
             return
 
-        # 중복 방지를 위해 기존 적재된 도서 ID 추출
         collection = _vector_store._collection
         existing_data = collection.get()
         existing_ids = set()
@@ -222,6 +212,50 @@ def background_fetch_and_update():
             for meta in existing_data["metadatas"]:
                 if meta and "id" in meta:
                     existing_ids.add(meta["id"])
+
+        # 1. 초기 1페이지 도서 중 동기 적재에서 제외되었던 나머지 부분 적재
+        remaining_books = []
+        for book in (full_bestsellers + full_new_releases):
+            book_id = book.get("id")
+            if book_id and book_id not in existing_ids:
+                existing_ids.add(book_id)
+                remaining_books.append(book)
+
+        if remaining_books:
+            print(f"[RAG-Background] 초기 수집 데이터 중 나머지 {len(remaining_books)}권의 도서 추가 임베딩 적재를 시작합니다...")
+            documents = []
+            for book in remaining_books:
+                formatted_text = format_book_document(book)
+                doc = Document(
+                    page_content=formatted_text,
+                    metadata={
+                        "id": book.get("id"),
+                        "title": book.get("title"),
+                        "author": book.get("author", "저자 미상"),
+                        "category": book.get("category"),
+                        "studyBookType": book.get("studyBookType") or "",
+                        "subject": book.get("subject") or "",
+                        "level": book.get("level", "입문"),
+                        "price": book.get("price", 0),
+                        "description": book.get("description", ""),
+                        "toc": json.dumps(book.get("toc", [])),
+                        "reviewSummary": book.get("reviewSummary", ""),
+                        "targetReader": book.get("targetReader", ""),
+                        "pickupAvailable": book.get("pickupAvailable", True),
+                        "coverImage": book.get("coverImage", "")
+                    }
+                )
+                documents.append(doc)
+            _vector_store.add_documents(documents)
+            print(f"[RAG-Background] 1페이지 나머지 {len(documents)}권 적재 완료. (현재 총 {collection.count()}권)")
+
+        # 2. 베스트셀러 2, 3페이지 추가 수집 및 적재
+        print("[RAG-Background] 백그라운드에서 베스트셀러 2, 3페이지 추가 수집을 시작합니다...")
+        extra_books = fetch_kyobo_bestsellers(pages=[2, 3], timeout=15.0)
+        
+        if not extra_books:
+            print("[RAG-Background] 백그라운드로 가져온 추가 도서 데이터가 없습니다.")
+            return
 
         documents = []
         for book in extra_books:
@@ -251,10 +285,8 @@ def background_fetch_and_update():
                 documents.append(doc)
                 
         if documents:
-            # Chroma DB에 신규 수집된 도서 문서 추가 적재
             _vector_store.add_documents(documents)
-            print(f"[RAG-Background] 성공적으로 {len(documents)}권 of 백그라운드 수집 도서를 Chroma DB에 추가 적재했습니다.")
-            print(f"[RAG-Background] 현재 총 Chroma DB 도서 수: {collection.count()}권")
+            print(f"[RAG-Background] 성공적으로 {len(documents)}권의 백그라운드 수집 도서를 Chroma DB에 추가 적재했습니다. (현재 총 {collection.count()}권)")
         else:
             print("[RAG-Background] 수집된 추가 도서가 이미 모두 DB에 적재되어 있어 추가하지 않았습니다.")
             
@@ -291,15 +323,18 @@ def get_vector_store() -> Chroma:
         print("[RAG] 교보문고 신간/MD추천 데이터를 API로부터 직접 로드합니다...")
         new_releases = fetch_kyobo_new_releases()
         
-        # ID 기준 중복 제거 병합
+        # ID 기준 중복 제거 병합 (초기 기동을 위해 베스트셀러 상위 30권, 신간 상위 20권만 먼저 병합)
+        bestsellers_slice = bestsellers[:30]
+        new_releases_slice = new_releases[:20]
+
         seen_ids = set()
         merged_books = []
-        for book in bestsellers:
+        for book in bestsellers_slice:
             book_id = book.get("id")
             if book_id and book_id not in seen_ids:
                 seen_ids.add(book_id)
                 merged_books.append(book)
-        for book in new_releases:
+        for book in new_releases_slice:
             book_id = book.get("id")
             if book_id and book_id not in seen_ids:
                 seen_ids.add(book_id)
@@ -308,7 +343,7 @@ def get_vector_store() -> Chroma:
         if len(merged_books) > 0:
             books = merged_books
             api_success = True
-            print(f"[RAG] 초기 API 로드 완료 (중복 제거 후 총 {len(books)}권: 베스트셀러 1페이지 {len(bestsellers)}권, 신간도서 {len(new_releases)}권)")
+            print(f"[RAG] 초기 API 로드 완료 (초기 동기 적재 {len(books)}권: 베스트셀러 상위 {len(bestsellers_slice)}권, 신간도서 상위 {len(new_releases_slice)}권)")
     except Exception as api_err:
         print(f"[RAG] 경고: 초기 API 로드 중 오류가 발생하여 정적 백업 데이터로 대체합니다. 오류 원인: {api_err}")
 
@@ -353,9 +388,9 @@ def get_vector_store() -> Chroma:
     )
     print(f"[RAG] 성공적으로 {len(documents)}권 of 도서를 Chroma DB({db_dir})에 초기 적재했습니다.")
 
-    # 3. 초기 API 호출이 성공한 경우에만 백그라운드 스레드를 띄워 베스트셀러 2, 3페이지 추가 적재 시작
+    # 3. 초기 API 호출이 성공한 경우에만 백그라운드 스레드를 띄워 베스트셀러 2, 3페이지 및 나머지 도서 추가 적재 시작
     if api_success:
-        print("[RAG] 베스트셀러 2, 3페이지의 추가 적재를 위한 백그라운드 스레드를 기동합니다...")
-        threading.Thread(target=background_fetch_and_update, daemon=True).start()
+        print("[RAG] 베스트셀러 2, 3페이지 및 나머지 1페이지 도서의 추가 적재를 위한 백그라운드 스레드를 기동합니다...")
+        threading.Thread(target=background_fetch_and_update, args=(bestsellers, new_releases), daemon=True).start()
 
     return _vector_store

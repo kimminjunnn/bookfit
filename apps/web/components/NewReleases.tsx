@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Book } from "@/types/book";
 import BookCard from "./BookCard";
+import { getCachedNewReleases, setCachedNewReleases } from "@/lib/bookCache";
 
 export default function NewReleases() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -11,15 +12,44 @@ export default function NewReleases() {
 
   useEffect(() => {
     async function loadNewReleases() {
+      // 1. 캐시 확인
+      const cached = getCachedNewReleases();
+      if (cached && cached.length > 0) {
+        setBooks(cached);
+        setLoading(false);
+        return;
+      }
+
       try {
-        const res = await fetch("/api/new-releases");
+        // 2. 초기 기동속도를 위한 최소 로딩 (10개)
+        const res = await fetch("/api/new-releases?limit=10");
+        let initialData: Book[] = [];
         if (res.ok) {
-          const data = await res.json();
-          setBooks(data);
+          initialData = await res.json();
+          setBooks(initialData);
         }
+        setLoading(false);
+
+        // 3. 백그라운드 프리페치 (0.5초 대기 후 전체 200개 호출)
+        setTimeout(async () => {
+          try {
+            const fullRes = await fetch("/api/new-releases");
+            if (fullRes.ok) {
+              const fullData = await fullRes.json();
+              setCachedNewReleases(fullData);
+              setBooks(fullData);
+            } else if (initialData.length > 0) {
+              setCachedNewReleases(initialData);
+            }
+          } catch (prefetchErr) {
+            console.error("Failed to prefetch full new releases:", prefetchErr);
+            if (initialData.length > 0) {
+              setCachedNewReleases(initialData);
+            }
+          }
+        }, 500);
       } catch (err) {
         console.error("Failed to load new releases:", err);
-      } finally {
         setLoading(false);
       }
     }

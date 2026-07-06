@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Book, BookCategory } from "@/types/book";
 import BookCard from "@/components/BookCard";
+import { getCachedNewReleases, setCachedNewReleases } from "@/lib/bookCache";
 
 const CATEGORIES: (BookCategory | "전체")[] = [
   "전체",
@@ -32,12 +33,23 @@ export default function NewReleasesPage() {
 
   useEffect(() => {
     async function fetchNewReleases() {
+      // 1. 캐시 확인
+      const cached = getCachedNewReleases();
+      if (cached && cached.length > 0) {
+        setAllBooks(cached);
+        setFilteredBooks(cached);
+        setLoading(false);
+        return;
+      }
+
       try {
-        const res = await fetch("/api/new-releases");
+        // 2. 캐시가 없을 때의 대비 (100개 fetch)
+        const res = await fetch("/api/new-releases?limit=100");
         if (res.ok) {
           const data = await res.json();
           setAllBooks(data);
           setFilteredBooks(data);
+          setCachedNewReleases(data);
         }
       } catch (err) {
         console.error("Failed to load new releases page data:", err);

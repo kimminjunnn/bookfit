@@ -126,9 +126,10 @@ export function mapKyoboNewestToBook(item: any): Book {
 const API_KEY =
   "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..ZLYbgLboRn9J3QDp.A-YRBm6F9k1E7qI5iavgb0fVVjf3ssgmxnSkhW_hW_pTdNUpVjElQkaxXYjj1c0_5ycE4Sgl75QDatH5olqvIN35DPL8xmcQmH4ClipOkZ40xMMf0YXbj_vez5_z0mqXPL2_ysQu.6bVxg8WPbzFolcmHaf_-zw";
 
-export async function fetchKyoboBestsellers(): Promise<Book[]> {
+export async function fetchKyoboBestsellers(limit?: number): Promise<Book[]> {
+  const per = limit || 200;
   const url =
-    "https://store.kyobobook.co.kr/api/gw/best/best-seller/online?page=1&per=200&period=001&dsplDvsnCode=000&dsplTrgtDvsnCode=001";
+    `https://store.kyobobook.co.kr/api/gw/best/best-seller/online?page=1&per=${per}&period=001&dsplDvsnCode=000&dsplTrgtDvsnCode=001`;
 
   const response = await fetch(url, {
     headers: {
@@ -147,9 +148,10 @@ export async function fetchKyoboBestsellers(): Promise<Book[]> {
   return rawBooks.map(mapKyoboToBook);
 }
 
-export async function fetchKyoboNewReleases(): Promise<Book[]> {
+export async function fetchKyoboNewReleases(limit?: number): Promise<Book[]> {
+  const per = limit || 200;
   const url =
-    "https://store.kyobobook.co.kr/api/gw/pdt/v2/newest/md-pick/list?page=1&per=200&sort=rec&saleCmdtDvsnCode=KOR&soldOutExcludeYn=N&weekth=2026071";
+    `https://store.kyobobook.co.kr/api/gw/pdt/v2/newest/md-pick/list?page=1&per=${per}&sort=rec&saleCmdtDvsnCode=KOR&soldOutExcludeYn=N&weekth=2026071`;
 
   const response = await fetch(url, {
     headers: {

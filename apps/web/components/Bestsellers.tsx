@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Book } from "@/types/book";
 import BookCard from "./BookCard";
+import { getCachedBestsellers, setCachedBestsellers } from "@/lib/bookCache";
 
 export default function Bestsellers() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -13,15 +14,44 @@ export default function Bestsellers() {
 
   useEffect(() => {
     async function loadBestsellers() {
+      // 1. 캐시 확인
+      const cached = getCachedBestsellers();
+      if (cached && cached.length > 0) {
+        setBooks(cached);
+        setLoading(false);
+        return;
+      }
+
       try {
-        const res = await fetch("/api/bestsellers");
+        // 2. 초기 기동속도를 위한 최소 로딩 (40개)
+        const res = await fetch("/api/bestsellers?limit=40");
+        let initialData: Book[] = [];
         if (res.ok) {
-          const data = await res.json();
-          setBooks(data);
+          initialData = await res.json();
+          setBooks(initialData);
         }
+        setLoading(false);
+
+        // 3. 백그라운드 프리페치 (0.5초 대기 후 전체 200개 호출)
+        setTimeout(async () => {
+          try {
+            const fullRes = await fetch("/api/bestsellers");
+            if (fullRes.ok) {
+              const fullData = await fullRes.json();
+              setCachedBestsellers(fullData);
+              setBooks(fullData); // 전체 데이터로 자연스럽게 확장
+            } else if (initialData.length > 0) {
+              setCachedBestsellers(initialData);
+            }
+          } catch (prefetchErr) {
+            console.error("Failed to prefetch full bestsellers:", prefetchErr);
+            if (initialData.length > 0) {
+              setCachedBestsellers(initialData);
+            }
+          }
+        }, 500);
       } catch (err) {
         console.error("Failed to load bestsellers:", err);
-      } finally {
         setLoading(false);
       }
     }

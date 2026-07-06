@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Book, BookCategory } from "@/types/book";
 import BookCard from "@/components/BookCard";
+import { getCachedBestsellers, setCachedBestsellers } from "@/lib/bookCache";
 
 const CATEGORIES: (BookCategory | "전체")[] = [
   "전체",
@@ -33,12 +34,22 @@ export default function BestsellersPage() {
   // 최초 1회 전체 데이터를 가져옴 (최대 200개)
   useEffect(() => {
     async function fetchBestsellers() {
+      // 1. 캐시 확인
+      const cached = getCachedBestsellers();
+      if (cached && cached.length > 0) {
+        setAllBooks(cached);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        const res = await fetch("/api/bestsellers");
+        // 캐시가 없으면 기본 limit=100 정도로 긁어서 캐싱 & 노출
+        const res = await fetch("/api/bestsellers?limit=100");
         if (res.ok) {
           const data = await res.json();
           setAllBooks(data);
+          setCachedBestsellers(data);
         }
       } catch (err) {
         console.error("Failed to load bestsellers page data:", err);
