@@ -116,7 +116,7 @@ export default function AiConsultModal() {
       />
 
       {/* Modal Container */}
-      <div className="fixed bg-white rounded-2xl z-50 flex flex-col overflow-y-auto md:overflow-hidden modal-panel-enter inset-0 m-auto w-[95%] md:w-full max-w-[760px] h-auto max-h-[80vh] md:h-[480px] shadow-[0_20px_60px_rgba(0,0,0,0.18)] border border-outline-variant/30">
+      <div className="fixed bg-white rounded-2xl z-50 flex flex-col overflow-hidden modal-panel-enter inset-0 m-auto w-[95%] md:w-full max-w-[760px] h-[620px] max-h-[94vh] shadow-[0_20px_60px_rgba(0,0,0,0.18)] border border-outline-variant/30">
         {/* Header */}
         <header className="bg-gradient-to-r from-primary to-[#005226] px-md h-[64px] flex justify-between items-center shrink-0 border-b border-white/10 shadow-sm">
           <div className="flex items-center gap-xs text-white">
@@ -137,7 +137,7 @@ export default function AiConsultModal() {
         </header>
 
         {/* Modal Content Area */}
-        <div className="flex-1 overflow-y-visible md:overflow-y-auto no-scrollbar p-md flex flex-col">
+        <div className="flex-1 overflow-y-auto no-scrollbar p-md flex flex-col">
           {status === "idle" && (
             <AiConsultForm onSubmit={handleFormSubmit} initialSituation={prefillText} />
           )}

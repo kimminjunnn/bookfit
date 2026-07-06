@@ -109,7 +109,7 @@ export default function RecommendationBookCard({
           </div>
 
           {/* Recommendation Reason (Scrollable) */}
-          <p className="text-[11px] leading-relaxed text-on-surface-variant/80 font-medium bg-[#fafbfa] p-1.5 pr-2 rounded border border-outline-variant/30 h-[78px] overflow-hidden md:overflow-y-auto line-clamp-4 md:line-clamp-none scrollbar-thin">
+          <p className="text-[11px] leading-relaxed text-on-surface-variant/80 font-medium bg-[#fafbfa] p-1.5 pr-2 rounded border border-outline-variant/30 h-[78px] overflow-y-auto scrollbar-thin">
             {recommendedBook.reason}
           </p>
         </div>
