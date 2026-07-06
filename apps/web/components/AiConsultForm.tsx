@@ -104,13 +104,13 @@ export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiCon
 
           {activeAccordion === "category" && (
             <div className="p-xs border-t border-outline-variant bg-white animate-fade-in max-h-[140px] overflow-y-auto no-scrollbar">
-              <div className="flex flex-wrap gap-xs">
+              <div className="grid grid-cols-3 gap-xs">
                 {categories.map((cat) => (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => setPreferredCategory(preferredCategory === cat ? "" : cat)}
-                    className={`px-2 py-1 rounded text-[11px] font-bold border transition-colors cursor-pointer ${preferredCategory === cat
+                    className={`px-1 py-1 rounded text-[11px] font-bold border transition-colors cursor-pointer text-center truncate ${preferredCategory === cat
                         ? "bg-primary text-white border-primary"
                         : "bg-[#f8f9f6] text-on-surface-variant/80 border-outline-variant hover:bg-white"
                       }`}
