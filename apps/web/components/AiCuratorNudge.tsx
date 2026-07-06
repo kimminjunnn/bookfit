@@ -49,37 +49,37 @@ export default function AiCuratorNudge({ variant, query }: AiCuratorNudgeProps) 
   // ── 2) 무결과 메인 CTA (no-result) ───────────────────────────────
   if (variant === "no-result") {
     return (
-      <div className="max-w-4xl mx-auto mt-lg p-xl rounded-xl bg-ai-promo-bg border border-outline-variant shadow-sm animate-fade-in text-left">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-xl">
-          <div className="flex items-start gap-md">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 shadow-sm">
+      <div className="w-full mt-lg flex flex-col md:flex-row items-center justify-between py-md px-xl rounded-xl bg-ai-promo-bg border border-outline-variant shadow-sm gap-lg text-left">
+        <div className="flex items-center gap-md shrink-0">
+          <div className="relative w-12 h-12 shrink-0">
+            <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-primary">
               <span
-                className="material-symbols-outlined text-[24px]"
+                className="material-symbols-outlined"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
-                search_off
+                psychology
               </span>
             </div>
-            <div>
-              <h2 className="text-[20px] font-bold text-on-surface tracking-[-0.01em]">
-                🔎 &lsquo;{query}&rsquo; 검색 결과가 없습니다
-              </h2>
-              <p className="text-[14.5px] text-on-surface-variant mt-xs leading-relaxed">
-                찾으시는 도서가 없거나 조건에 맞지 않습니다. AI 큐레이터에게 상황을 설명하고 딱 맞는 추천 도서를 받아보세요.
-              </p>
-            </div>
+            {/* AI 말풍선 뱃지 */}
+            <span className="absolute -top-1 -right-1 bg-secondary text-white text-[9px] font-bold leading-none px-[5px] py-[3px] rounded-full shadow-sm tracking-wide">
+              AI
+            </span>
           </div>
+          <h2 className="text-[32px] font-bold text-secondary tracking-[-0.01em] leading-none">
+            BookFit
+          </h2>
+        </div>
+        
+        <div className="flex flex-col md:flex-row items-center gap-lg md:ml-auto mt-4 md:mt-0 text-center md:text-right">
+          <p className="text-[15px] text-on-surface-variant leading-relaxed">
+            <span className="font-semibold text-secondary">🔎 &lsquo;{query}&rsquo; 검색 결과가 없습니다</span><br />
+            찾으시는 도서가 없거나 조건에 맞지 않습니다. AI 큐레이터에게 상황을 설명하고 딱 맞는 추천 도서를 받아보세요.
+          </p>
           <button
             onClick={handleOpen}
-            className="w-full md:w-auto h-12 px-xl bg-primary text-white rounded-lg text-[14px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-xs cursor-pointer shadow-md whitespace-nowrap"
+            className="w-full md:w-auto h-12 px-xl bg-secondary-container text-on-secondary-container rounded-lg text-[15px] font-semibold tracking-[0.02em] hover:opacity-90 transition-opacity whitespace-nowrap cursor-pointer shrink-0"
           >
-            <span
-              className="material-symbols-outlined text-[16px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              auto_awesome
-            </span>
-            AI 상담 시작
+            대화하기
           </button>
         </div>
       </div>

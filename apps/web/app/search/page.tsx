@@ -19,14 +19,17 @@ function SearchResults() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const fetchResults = useCallback(async (query: string) => {
     if (!query.trim()) {
       setBooks([]);
       setTotal(0);
+      setHasSearched(false);
       return;
     }
     setLoading(true);
+    setHasSearched(false);
     setError(null);
     try {
       const params = new URLSearchParams({ q: query });
@@ -39,10 +42,15 @@ function SearchResults() {
       setError(e.message || "오류가 발생했습니다.");
     } finally {
       setLoading(false);
+      setHasSearched(true);
     }
   }, []);
 
   useEffect(() => {
+    if (q.trim()) {
+      setLoading(true);
+      setHasSearched(false);
+    }
     fetchResults(q);
   }, [q, fetchResults]);
 
@@ -52,7 +60,7 @@ function SearchResults() {
   };
 
   const isConsultQuery = looksLikeConsultQuery(q);
-  const noResult = !loading && !error && books.length === 0 && q.trim() !== "";
+  const noResult = !loading && !error && books.length === 0 && q.trim() !== "" && hasSearched;
 
   return (
     <div className="max-w-[1200px] w-full mx-auto px-gutter py-xl animate-fade-in">
@@ -74,12 +82,7 @@ function SearchResults() {
 
 
 
-      {/* 로딩 표시 */}
-      {loading && (
-        <div className="py-2xl">
-          <LoadingState variant="search" />
-        </div>
-      )}
+
 
       {/* 에러 표시 */}
       {error && !loading && (
