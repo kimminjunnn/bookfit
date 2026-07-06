@@ -55,7 +55,7 @@ export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiCon
             className="material-symbols-outlined text-primary text-[16px]"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
-            smart_toy
+            psychology
           </span>
         </div>
         <div className="bg-[#f8f9f6] px-md py-xs rounded-2xl rounded-tl-none border border-outline-variant/50 flex-1">
@@ -72,7 +72,7 @@ export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiCon
           <textarea
             value={situation}
             onChange={(e) => setSituation(e.target.value)}
-            className="w-full h-56 p-sm rounded-xl border border-outline-variant bg-white focus:ring-1 focus:ring-primary focus:border-primary resize-none text-[13px] leading-relaxed text-on-surface placeholder:text-on-surface-variant/40 outline-none transition-colors"
+            className="w-full h-56 p-sm rounded-xl border-2 border-primary/60 bg-white focus:border-primary focus:ring-1 focus:ring-primary resize-none text-[13px] leading-relaxed text-on-surface placeholder:text-on-surface-variant/40 outline-none transition-colors"
             placeholder="예: 번아웃이 와서 가볍게 읽을 책이 필요해요 / 내년 공인중개사 시험을 준비하려고 해요."
           />
         </div>
@@ -101,13 +101,13 @@ export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiCon
 
           {isCategoryOpen && (
             <div className="p-xs border-t border-outline-variant bg-white animate-fade-in max-h-[140px] overflow-y-auto no-scrollbar">
-              <div className="flex flex-wrap gap-xs">
+              <div className="grid grid-cols-3 gap-xs">
                 {categories.map((cat) => (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => setPreferredCategory(preferredCategory === cat ? "" : cat)}
-                    className={`px-2 py-1 rounded text-[11px] font-bold border transition-colors cursor-pointer ${preferredCategory === cat
+                    className={`px-1 py-1 rounded text-[11px] font-bold border transition-colors cursor-pointer text-center truncate ${preferredCategory === cat
                         ? "bg-primary text-white border-primary"
                         : "bg-[#f8f9f6] text-on-surface-variant/80 border-outline-variant hover:bg-white"
                       }`}

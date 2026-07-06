@@ -72,6 +72,11 @@ export default function RecommendationBookCard({
             <p className="text-white text-center text-[9px] font-semibold leading-tight line-clamp-2 mt-1">
               {bookTitle}
             </p>
+            {author && (
+              <p className="text-white/70 text-center text-[8px] mt-0.5 line-clamp-1">
+                {author}
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -84,35 +89,33 @@ export default function RecommendationBookCard({
             {bookTitle}
           </h4>
 
+          {/* Author & Price */}
+          <div className="flex justify-between items-center text-[10.5px] text-on-surface-variant/80 font-semibold">
+            <span className="truncate max-w-[120px]">{author ? `${author} 저` : ""}</span>
+            <span className="text-on-surface">
+              {price ? price.toLocaleString("ko-KR") + "원" : ""}
+            </span>
+          </div>
+
           {/* Details & Status */}
           <div className="flex flex-wrap items-center justify-between text-[10.5px] font-bold text-on-surface-variant/70">
             {category ? (
-              <span className="text-secondary truncate max-w-[70px]">
+              <span className="text-secondary truncate">
                 {category}
               </span>
             ) : (
               <span />
             )}
-            {pickupAvailable ? (
-              <span className="text-primary flex items-center gap-0.5 shrink-0">
-                <span className="material-symbols-outlined text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>store</span>
-                바로드림
-              </span>
-            ) : (
-              <span className="text-on-surface-variant/50 shrink-0">
-                배송전용
-              </span>
-            )}
           </div>
 
-          {/* Recommendation Reason (line-clamp-3) */}
-          <p className="text-[11px] leading-relaxed text-on-surface-variant/80 line-clamp-3 font-medium bg-[#fafbfa] p-1.5 rounded border border-outline-variant/30">
+          {/* Recommendation Reason (Scrollable) */}
+          <p className="text-[11px] leading-relaxed text-on-surface-variant/80 font-medium bg-[#fafbfa] p-1.5 pr-2 rounded border border-outline-variant/30 h-[78px] overflow-y-auto scrollbar-thin">
             {recommendedBook.reason}
           </p>
         </div>
 
-        {/* View Details Button */}
-        <div className="pt-2 border-t border-outline-variant/35 flex justify-end">
+        {/* Actions Section */}
+        <div className="pt-2 border-t border-outline-variant/35 flex justify-between items-center">
           <Link
             href={`/books/${recommendedBook.id}?reason=${encodeURIComponent(recommendedBook.reason)}`}
             onClick={handleDetailClick}
@@ -123,6 +126,27 @@ export default function RecommendationBookCard({
               chevron_right
             </span>
           </Link>
+          <div className="flex gap-1.5">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                alert("장바구니에 담겼습니다.");
+              }}
+              className="bg-outline-variant/40 hover:bg-outline-variant/60 text-on-surface text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-0.5 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[11px]">shopping_cart</span>
+              담기
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                alert("바로 구매 화면으로 이동합니다. (데모)");
+              }}
+              className="bg-primary hover:bg-primary/90 text-on-primary text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-0.5 cursor-pointer"
+            >
+              구매
+            </button>
+          </div>
         </div>
       </div>
     </div>
