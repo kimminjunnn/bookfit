@@ -598,5 +598,20 @@
     "targetReader": "인생의 방향과 목표를 체계적으로 정리하고 싶은 사람",
     "pickupAvailable": true,
     "coverImage": "/images/book_040.png"
+  },
+  {
+    "id": "health_diagnosis",
+    "title": "내 몸 건강 진단서",
+    "author": "BookFit 편집부",
+    "category": "과학",
+    "subject": "건강 관리",
+    "level": "입문",
+    "price": 18500,
+    "description": "몸이 보내는 신호, 부위별로 점검하기. 바쁜 현대인을 위해 일상 속 증상별 자가 진단 리스트와 예방법을 담은 필수 건강 가이드북입니다.",
+    "toc": ["1장. 왜 내 몸의 목소리에 귀를 기울여야 하는가", "2장. 일상 속 피로와 면역력 자가진단", "3장. 거북목과 척추 건강 바로잡기", "4장. 오늘부터 시작하는 스트레칭"],
+    "reviewSummary": "자가 체크리스트가 아주 실용적이고 부모님 선물용으로 좋다는 평이 많음",
+    "targetReader": "원인 모를 피로감에 시달리는 현대인 및 건강에 관심이 많은 분",
+    "pickupAvailable": true,
+    "coverImage": "/health_book_cover.png"
   }
 ]
