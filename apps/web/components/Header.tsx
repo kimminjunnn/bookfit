@@ -103,12 +103,6 @@ export default function Header() {
               search
             </span>
           </button>
-
-          <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface transition-colors">
-            <span className="material-symbols-outlined text-on-surface-variant">
-              person
-            </span>
-          </button>
         </div>
       </div>
 

@@ -38,7 +38,7 @@ export default function NewReleases() {
           </h2>
         </div>
         {/* 5열 × 2행 스켈레톤 */}
-        <div className="grid grid-cols-5 gap-lg">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-lg">
           {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
@@ -67,7 +67,7 @@ export default function NewReleases() {
         </Link>
       </div>
       {/* 5열 × 2행 그리드 */}
-      <div className="grid grid-cols-5 gap-lg">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-lg">
         {displayBooks.map((book, i) => (
           <BookCard key={book.id} book={book} variant="new-release" index={i} />
         ))}
