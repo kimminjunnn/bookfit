@@ -2,102 +2,14 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useAiConsult } from "./AiConsultContext";
-
-interface Slide {
-  id: number;
-  tag: string;
-  tagColor: string;
-  tagTextColor: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  cta?: string;
-  ctaStyle: string;
-  bgImage: string;
-  overlayGradient: string;
-  accentColor: string;
-  rightVisual: "book" | "trophy" | "store" | "none";
-}
-
-const slides: Slide[] = [
-  {
-    id: 0,
-    tag: "이벤트",
-    tagColor: "bg-[#F97316]",
-    tagTextColor: "text-white",
-    title: "독서의 달 기념\n전 도서 10% 적립",
-    subtitle: "7월 한 달간",
-    description:
-      "가을의 시작을 책과 함께하세요.\n모든 도서 구매 시 포인트 혜택을 드립니다.",
-    cta: "이벤트 보기",
-    ctaStyle:
-      "bg-[#F97316] text-white hover:bg-[#ea6a08] shadow-[0_0_24px_rgba(249,115,22,0.5)]",
-    bgImage: "/banner-slide1.png",
-    overlayGradient:
-      "linear-gradient(105deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.1) 100%)",
-    accentColor: "#F97316",
-    rightVisual: "none",
-  },
-  {
-    id: 1,
-    tag: "신작 출시",
-    tagColor: "bg-[#0EA5E9]",
-    tagTextColor: "text-white",
-    title: "올해의 화제작\n내 몸 건강 진단서",
-    subtitle: "2025 베스트셀러",
-    description:
-      "몸이 보내는 신호, 부위별로 점검하기.\n당신의 건강을 위한 필독서가 출시되었습니다.",
-    cta: "자세히 보기",
-    ctaStyle:
-      "bg-[#0EA5E9] text-white hover:bg-[#0284c7] shadow-[0_0_24px_rgba(14,165,233,0.5)]",
-    bgImage: "/banner-slide2.png",
-    overlayGradient:
-      "linear-gradient(105deg, rgba(2,12,30,0.88) 0%, rgba(2,12,30,0.65) 50%, rgba(2,12,30,0.15) 100%)",
-    accentColor: "#0EA5E9",
-    rightVisual: "book",
-  },
-  {
-    id: 2,
-    tag: "공모전",
-    tagColor: "bg-[#EAB308]",
-    tagTextColor: "text-black",
-    title: "제1회 BookFit AI\n독후감 공모전",
-    subtitle: "총 상금 500만원",
-    description:
-      "AI와 함께하는 새로운 독서 경험.\n당신만의 이야기를 들려주세요.",
-    cta: "지금 참여하기",
-    ctaStyle:
-      "bg-[#EAB308] text-black hover:bg-[#ca9a07] shadow-[0_0_24px_rgba(234,179,8,0.5)]",
-    bgImage: "/banner-slide3.png",
-    overlayGradient:
-      "linear-gradient(105deg, rgba(20,10,40,0.85) 0%, rgba(20,10,40,0.60) 50%, rgba(20,10,40,0.1) 100%)",
-    accentColor: "#EAB308",
-    rightVisual: "trophy",
-  },
-  {
-    id: 3,
-    tag: "서비스 안내",
-    tagColor: "bg-[#22C55E]",
-    tagTextColor: "text-white",
-    title: "바로드림 서비스\n이용 안내",
-    subtitle: "30분 내 픽업 보장",
-    description:
-      "온라인으로 주문하고 매장에서 바로 픽업!\n더 빠르고 편리한 독서 생활을 경험하세요.",
-    cta: "이용방법 확인",
-    ctaStyle:
-      "bg-[#22C55E] text-white hover:bg-[#16a34a] shadow-[0_0_24px_rgba(34,197,94,0.5)]",
-    bgImage: "/banner-slide4.png",
-    overlayGradient:
-      "linear-gradient(105deg, rgba(0,20,10,0.82) 0%, rgba(0,20,10,0.55) 50%, rgba(0,20,10,0.1) 100%)",
-    accentColor: "#22C55E",
-    rightVisual: "store",
-  },
-];
+import { slides } from "@/lib/slidesData";
 
 const SLIDE_DURATION = 3333; // 1.5x faster (5000ms / 1.5)
 
 export default function HeroBanner() {
+  const router = useRouter();
   const { openModal } = useAiConsult();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [prevSlide, setPrevSlide] = useState<number | null>(null);
@@ -162,8 +74,9 @@ export default function HeroBanner() {
     }
   }, [progress, goNext]);
 
-  const handleCta = (slideId: number) => {
-    if (slideId === 2) openModal();
+  const handleCta = (slideId: number, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    router.push(`/events/${slideId}`);
   };
 
   return (
@@ -187,7 +100,8 @@ export default function HeroBanner() {
         return (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-transform duration-700 ease-in-out ${translateClass} ${
+            onClick={() => router.push(`/events/${slide.id}`)}
+            className={`absolute inset-0 transition-transform duration-700 ease-in-out cursor-pointer ${translateClass} ${
               !isCurrent && !isPrev ? "hidden" : ""
             }`}
           >
@@ -253,7 +167,7 @@ export default function HeroBanner() {
                   {/* CTA Button */}
                   {slide.cta && (
                     <button
-                      onClick={() => handleCta(slide.id)}
+                      onClick={(e) => handleCta(slide.id, e)}
                       className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-[14px] font-bold transition-all duration-200 hover:scale-[1.04] active:scale-[0.98] cursor-pointer ${slide.ctaStyle}`}
                     >
                       {slide.cta}
