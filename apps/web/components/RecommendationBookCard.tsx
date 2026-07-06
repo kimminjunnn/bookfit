@@ -37,36 +37,36 @@ export default function RecommendationBookCard({
     }
   }, [recommendedBook.id]);
 
-  const bookTitle = recommendedBook.title || fullBook?.title || "도서 이미지";
-  const author = recommendedBook.author || recommendedBook.author || fullBook?.author || "";
-  const price = recommendedBook.price || fullBook?.price;
-  const category = recommendedBook.category || fullBook?.category;
-  const coverImage = recommendedBook.coverImage || fullBook?.coverImage;
-  const pickupAvailable = recommendedBook.pickupAvailable !== undefined ? recommendedBook.pickupAvailable : (fullBook ? fullBook.pickupAvailable : false);
+  const bookTitle = fullBook?.title || recommendedBook.title;
+  const author = fullBook?.author || recommendedBook.author || "";
+  const price = fullBook?.price || recommendedBook.price;
+  const category = fullBook?.category || recommendedBook.category;
+  const coverImage = fullBook?.coverImage || recommendedBook.coverImage;
+  const pickupAvailable = fullBook ? fullBook.pickupAvailable : recommendedBook.pickupAvailable;
 
   const gradientClass = COVER_GRADIENTS[index % COVER_GRADIENTS.length];
 
   return (
-    <div className="flex gap-md p-md bg-white border border-outline-variant rounded-xl hover:shadow-md transition-shadow relative overflow-hidden">
+    <div className="flex flex-col p-sm bg-white border border-outline-variant rounded-xl transition-shadow relative overflow-hidden h-full justify-between">
       {/* Sequence badge */}
-      <div className="absolute top-0 left-0 bg-primary text-on-primary text-[12px] font-bold px-2.5 py-1 rounded-br-xl z-10">
+      <div className="absolute top-0 left-0 bg-primary text-on-primary text-[10.5px] font-bold px-2 py-0.5 rounded-br-lg z-10">
         {recommendedBook.order}
       </div>
 
-      {/* Book Cover Container */}
-      <div className="relative w-[75px] h-[100px] bg-surface border border-outline-variant rounded overflow-hidden shrink-0 shadow-sm mt-3 sm:mt-0">
+      {/* Book Cover Container (Top) */}
+      <div className="relative w-full h-[170px] bg-[#f8f9f6] border border-outline-variant/60 rounded overflow-hidden shrink-0 shadow-sm flex items-center justify-center">
         {coverImage && !imgError ? (
           <Image
             src={coverImage}
             alt={bookTitle}
             fill
-            className="object-cover"
-            sizes="75px"
+            className="object-contain"
+            sizes="220px"
             onError={() => setImgError(true)}
           />
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${gradientClass} flex flex-col items-center justify-center p-2`}>
-            <span className="material-symbols-outlined text-white/40 text-[20px]">
+            <span className="material-symbols-outlined text-white/40 text-[18px]">
               menu_book
             </span>
             <p className="text-white text-center text-[9px] font-semibold leading-tight line-clamp-2 mt-1">
@@ -76,55 +76,50 @@ export default function RecommendationBookCard({
         )}
       </div>
 
-      {/* Book Info & Recommendation Reason */}
-      <div className="flex-1 min-w-0 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center flex-wrap gap-xs mb-1">
-            {category && (
-              <span className="px-1.5 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-[11px] font-bold rounded">
-                {category}
-              </span>
-            )}
-            {pickupAvailable ? (
-              <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[11px] font-bold rounded flex items-center gap-0.5">
-                <span className="material-symbols-outlined text-[12px]">store</span>
-                바로드림 가능
-              </span>
-            ) : (
-              <span className="px-1.5 py-0.5 bg-on-surface-variant/10 text-on-surface-variant text-[11px] font-bold rounded">
-                배송 주문 전용
-              </span>
-            )}
-          </div>
-
-          <h4 className="font-bold text-[16px] text-on-surface line-clamp-1">
+      {/* Book Info & Reason (Bottom) */}
+      <div className="flex-1 flex flex-col justify-between mt-2 min-w-0">
+        <div className="space-y-1">
+          {/* Title */}
+          <h4 className="font-extrabold text-[13px] text-on-surface line-clamp-1" title={bookTitle}>
             {bookTitle}
           </h4>
 
-          {author && (
-            <p className="text-[13px] text-on-surface-variant/80 mt-0.5">
-              {author} 저자 {price && `· ${price.toLocaleString("ko-KR")}원`}
-            </p>
-          )}
-
-          {/* AI Recommendation Reason */}
-          <div className="mt-2 bg-background p-2 rounded-lg border border-outline-variant/50">
-            <p className="text-[13px] leading-relaxed text-on-surface-variant">
-              <span className="font-semibold text-primary text-[12px] block mb-0.5">추천 이유</span>
-              {recommendedBook.reason}
-            </p>
+          {/* Details & Status */}
+          <div className="flex flex-wrap items-center justify-between text-[10.5px] font-bold text-on-surface-variant/70">
+            {category ? (
+              <span className="text-secondary truncate max-w-[70px]">
+                {category}
+              </span>
+            ) : (
+              <span />
+            )}
+            {pickupAvailable ? (
+              <span className="text-primary flex items-center gap-0.5 shrink-0">
+                <span className="material-symbols-outlined text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>store</span>
+                바로드림
+              </span>
+            ) : (
+              <span className="text-on-surface-variant/50 shrink-0">
+                배송전용
+              </span>
+            )}
           </div>
+
+          {/* Recommendation Reason (line-clamp-3) */}
+          <p className="text-[11px] leading-relaxed text-on-surface-variant/80 line-clamp-3 font-medium bg-[#fafbfa] p-1.5 rounded border border-outline-variant/30">
+            {recommendedBook.reason}
+          </p>
         </div>
 
         {/* View Details Button */}
-        <div className="mt-3 flex justify-end">
+        <div className="pt-2 border-t border-outline-variant/35 flex justify-end">
           <Link
             href={`/books/${recommendedBook.id}?reason=${encodeURIComponent(recommendedBook.reason)}`}
             onClick={handleDetailClick}
-            className="text-[12px] font-semibold text-secondary hover:text-secondary-container flex items-center gap-0.5 group"
+            className="text-[11px] font-bold text-secondary hover:text-secondary-container flex items-center gap-0.5 group"
           >
             상세 보기
-            <span className="material-symbols-outlined text-[14px] transition-transform group-hover:translate-x-0.5">
+            <span className="material-symbols-outlined text-[12px] transition-transform group-hover:translate-x-0.5">
               chevron_right
             </span>
           </Link>
