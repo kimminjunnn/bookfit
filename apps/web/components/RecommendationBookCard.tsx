@@ -115,7 +115,7 @@ export default function RecommendationBookCard({
         </div>
 
         {/* Actions Section */}
-        <div className="pt-2 border-t border-outline-variant/35 flex justify-between items-center">
+        <div className="pt-2 border-t border-outline-variant/35 flex justify-end">
           <Link
             href={`/books/${recommendedBook.id}?reason=${encodeURIComponent(recommendedBook.reason)}`}
             onClick={handleDetailClick}
@@ -126,27 +126,6 @@ export default function RecommendationBookCard({
               chevron_right
             </span>
           </Link>
-          <div className="flex gap-1.5">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                alert("장바구니에 담겼습니다.");
-              }}
-              className="bg-outline-variant/40 hover:bg-outline-variant/60 text-on-surface text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-0.5 cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[11px]">shopping_cart</span>
-              담기
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                alert("바로 구매 화면으로 이동합니다. (데모)");
-              }}
-              className="bg-primary hover:bg-primary/90 text-on-primary text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-0.5 cursor-pointer"
-            >
-              구매
-            </button>
-          </div>
         </div>
       </div>
     </div>
