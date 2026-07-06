@@ -17,12 +17,9 @@ export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiCon
   const [preferredCategory, setPreferredCategory] = useState("");
   const [goal, setGoal] = useState("");
 
-  // Accordion active state: 'category' | 'purpose' | null
-  const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
-
-  const toggleAccordion = (name: string) => {
-    setActiveAccordion((prev) => (prev === name ? null : name));
-  };
+  // Accordion active states
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isPurposeOpen, setIsPurposeOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +86,7 @@ export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiCon
           <button
             type="button"
             className="w-full flex justify-between items-center p-xs bg-[#fafbfa] hover:bg-surface/50 transition-colors text-left cursor-pointer"
-            onClick={() => toggleAccordion("category")}
+            onClick={() => setIsCategoryOpen(!isCategoryOpen)}
           >
             <div className="flex items-center gap-xs">
               <span className={`material-symbols-outlined text-[16px] ${preferredCategory ? 'text-primary' : 'text-on-surface-variant/75'}`}>category</span>
@@ -97,12 +94,12 @@ export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiCon
                 선호 분야 {preferredCategory && <span className="text-primary ml-0.5">({preferredCategory})</span>}
               </span>
             </div>
-            <span className={`material-symbols-outlined text-on-surface-variant/60 text-[16px] transition-transform duration-200 ${activeAccordion === "category" ? "rotate-180" : ""}`}>
+            <span className={`material-symbols-outlined text-on-surface-variant/60 text-[16px] transition-transform duration-200 ${isCategoryOpen ? "rotate-180" : ""}`}>
               expand_more
             </span>
           </button>
 
-          {activeAccordion === "category" && (
+          {isCategoryOpen && (
             <div className="p-xs border-t border-outline-variant bg-white animate-fade-in max-h-[140px] overflow-y-auto no-scrollbar">
               <div className="flex flex-wrap gap-xs">
                 {categories.map((cat) => (
@@ -128,7 +125,7 @@ export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiCon
           <button
             type="button"
             className="w-full flex justify-between items-center p-xs bg-[#fafbfa] hover:bg-surface/50 transition-colors text-left cursor-pointer"
-            onClick={() => toggleAccordion("purpose")}
+            onClick={() => setIsPurposeOpen(!isPurposeOpen)}
           >
             <div className="flex items-center gap-xs">
               <span className={`material-symbols-outlined text-[16px] ${goal ? 'text-primary' : 'text-on-surface-variant/75'}`}>track_changes</span>
@@ -136,12 +133,12 @@ export default function AiConsultForm({ onSubmit, initialSituation = "" }: AiCon
                 독서 목적 {goal && <span className="text-primary ml-0.5">({goal})</span>}
               </span>
             </div>
-            <span className={`material-symbols-outlined text-on-surface-variant/60 text-[16px] transition-transform duration-200 ${activeAccordion === "purpose" ? "rotate-180" : ""}`}>
+            <span className={`material-symbols-outlined text-on-surface-variant/60 text-[16px] transition-transform duration-200 ${isPurposeOpen ? "rotate-180" : ""}`}>
               expand_more
             </span>
           </button>
 
-          {activeAccordion === "purpose" && (
+          {isPurposeOpen && (
             <div className="p-xs border-t border-outline-variant bg-white animate-fade-in">
               <div className="grid grid-cols-2 gap-xs">
                 {goals.map((g) => (
