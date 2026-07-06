@@ -68,17 +68,23 @@ export default function Header() {
                 value={searchVal}
                 onChange={(e) => {
                   setSearchVal(e.target.value);
-                  setAutocompleteOpen(e.target.value.trim().length >= 2);
+                  setAutocompleteOpen(e.target.value.trim().length >= 1);
                 }}
                 onFocus={() => {
-                  if (searchVal.trim().length >= 2) setAutocompleteOpen(true);
+                  if (searchVal.trim().length >= 1) setAutocompleteOpen(true);
                 }}
                 className="w-[320px] h-12 px-md pl-10 rounded-lg border border-outline-variant bg-[#F5F5F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-[15px]"
                 autoComplete="off"
               />
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
-                search
-              </span>
+              <button
+                type="submit"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="검색"
+              >
+                <span className="material-symbols-outlined">
+                  search
+                </span>
+              </button>
             </form>
             {autocompleteOpen && (
               <SearchAutocomplete
@@ -120,15 +126,21 @@ export default function Header() {
                 value={mobileSearchVal}
                 onChange={(e) => {
                   setMobileSearchVal(e.target.value);
-                  setMobileAutocompleteOpen(e.target.value.trim().length >= 2);
+                  setMobileAutocompleteOpen(e.target.value.trim().length >= 1);
                 }}
                 className="w-full h-12 px-md pl-10 rounded-lg border border-outline-variant bg-[#F5F5F5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-[15px]"
                 autoFocus
                 autoComplete="off"
               />
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
-                search
-              </span>
+              <button
+                type="submit"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="검색"
+              >
+                <span className="material-symbols-outlined">
+                  search
+                </span>
+              </button>
             </form>
             {mobileAutocompleteOpen && (
               <SearchAutocomplete

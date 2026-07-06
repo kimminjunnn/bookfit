@@ -72,17 +72,12 @@ function SearchResults() {
         </h1>
       </div>
 
-      {/* 상황형 쿼리 감지 배너 (banner) */}
-      {isConsultQuery && q && !loading && (
-        <div className="mb-lg animate-fade-in">
-          <AiCuratorNudge variant="banner" query={q} />
-        </div>
-      )}
+
 
       {/* 로딩 표시 */}
       {loading && (
         <div className="py-2xl">
-          <LoadingState />
+          <LoadingState variant="search" />
         </div>
       )}
 
@@ -152,7 +147,7 @@ export default function SearchPage() {
     <Suspense
       fallback={
         <div className="max-w-[1200px] mx-auto px-gutter py-xl">
-          <LoadingState />
+          <LoadingState variant="search" />
         </div>
       }
     >

@@ -95,7 +95,7 @@ const slides: Slide[] = [
   },
 ];
 
-const SLIDE_DURATION = 5000;
+const SLIDE_DURATION = 3333; // 1.5x faster (5000ms / 1.5)
 
 export default function HeroBanner() {
   const { openModal } = useAiConsult();
@@ -106,7 +106,6 @@ export default function HeroBanner() {
   const [progress, setProgress] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
-  const slideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const goToSlide = useCallback(
     (index: number, dir: "next" | "prev" = "next") => {
@@ -134,33 +133,34 @@ export default function HeroBanner() {
     goToSlide(prev, "prev");
   }, [currentSlide, goToSlide]);
 
-  // Progress bar
+  // Single timer for both progress and slide advance
   useEffect(() => {
-    if (isPaused) {
+    if (isPaused || isAnimating) {
       if (progressInterval.current) clearInterval(progressInterval.current);
       return;
     }
+
+    const intervalTime = 30; // ~33fps
+    const totalSteps = SLIDE_DURATION / intervalTime;
+
     progressInterval.current = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) return 0;
-        return p + 100 / (SLIDE_DURATION / 50);
+      setProgress((prev) => {
+        if (prev >= 100) return 100;
+        return Math.min(100, prev + 100 / totalSteps);
       });
-    }, 50);
+    }, intervalTime);
+
     return () => {
       if (progressInterval.current) clearInterval(progressInterval.current);
     };
-  }, [isPaused, currentSlide]);
+  }, [isPaused, isAnimating, currentSlide]);
 
-  // Auto advance
+  // Effect to watch progress and trigger slide change
   useEffect(() => {
-    if (isPaused) return;
-    slideTimer.current = setTimeout(() => {
+    if (progress >= 100) {
       goNext();
-    }, SLIDE_DURATION);
-    return () => {
-      if (slideTimer.current) clearTimeout(slideTimer.current);
-    };
-  }, [isPaused, currentSlide, goNext]);
+    }
+  }, [progress, goNext]);
 
   const handleCta = (slideId: number) => {
     if (slideId === 2) openModal();
