@@ -61,7 +61,7 @@ export default function SearchAutocomplete({
           auto_awesome
         </span>
         <span className="text-[13px] text-on-surface leading-tight">
-          <span className="font-semibold text-primary">&lsquo;{query}&rsquo;</span>에 대해 AI 독서 큐레이터에게 상담받기
+          <span className="font-semibold text-primary">&lsquo;{query}&rsquo;</span>에 대해 AI BookFit과 대화하기
         </span>
       </button>
     </div>
